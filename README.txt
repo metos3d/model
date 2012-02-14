@@ -19,7 +19,7 @@ subroutine metos3dbgc(n, nz, m, nb, nd, dt, q, t, y, u, b, d)
     real*8  :: d(nz, nd)   ! domain conditions
 end subroutine
 
-The interface decouples biogeochemical models and driver routines (ocean circulation, forcing, geometry) programmatically. It gives you the possibility to provide a free number of tracers, parameters, boundary and domain conditions. It suits well an optimization as well as an Automatic Differentiation (AD) context.
+The interface decouples biogeochemical models and driver routines (ocean circulation, forcing, geometry) programmatically. It gives you the possibility to use a free number of tracers, parameters, boundary and domain conditions. It suits well an optimization as well as an Automatic Differentiation (AD) context.
 
 -- Documentation --
 

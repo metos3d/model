@@ -17,7 +17,7 @@
 !
 !   model.F
 !
-!   Model for Iodine and Caesium
+!   Model for Iodine and Caesium.
 !
 
       subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt,
