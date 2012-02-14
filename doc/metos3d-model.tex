@@ -1,0 +1,202 @@
+%
+% Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
+% Copyright (C) 2012  Jaroslaw Piwonski, CAU, jpi@informatik.uni-kiel.de
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%   metos3d-model.tex
+
+%
+%	document class
+%
+\documentclass{article}
+%
+%	packages
+%
+\usepackage{amsmath}
+\usepackage[pdfborder={0 0 0},colorlinks,urlcolor=blue]{hyperref}
+%
+%	new commands
+%
+\newcommand{\lmb}{{\lambda}}
+\newcommand{\sig}{\sigma}
+\newcommand{\sigb}{\bar{\sigma}}
+\newcommand{\Om}{\Omega}
+\newcommand{\dd}{\partial}
+%\newcommand{\kap}{\kappa}
+%
+%	commands
+%
+\parindent0em
+%
+%	BEGIN DOCUMENT
+%
+\begin{document}
+%
+%	title
+%
+\title{
+Metos3D \\
+\bigskip
+Biogeochemical Models
+}
+\author{
+Jaroslaw Piwonski\thanks{\texttt{jpi@informatik.uni-kiel.de}} \,,
+Thomas Slawig\thanks{\texttt{ts@informatik.uni-kiel.de},
+both: Department of Computer Science, Algorithmic Optimal Control -- Computational Marine Science,
+Excellence Cluster The Future Ocean, Christian-Albrechts-Platz 4, 24118 Kiel, Germany.}
+}
+\date{\today}
+\maketitle
+
+%
+%	Introdution
+%
+\section{Introdution}
+
+Metos3D can be coupled to every (biogeochemical) model that conforms to the following interface:
+
+\begin{verbatim}
+subroutine metos3dbgc(n, nz, m, nb, nd, dt, q, t, y, u, b, d)
+    integer :: n           ! tracer count
+    integer :: nz          ! layer count
+    integer :: m           ! parameter count
+    integer :: nb          ! boundary condition count
+    integer :: nd          ! domain condition count
+    real*8  :: dt          ! ocean time step
+    real*8  :: q(nz, n)    ! bgc model output
+    real*8  :: t           ! point in time
+    real*8  :: y(nz, n)    ! bgc model input
+    real*8  :: u(m)        ! parameters
+    real*8  :: b(nb)       ! boundary conditions
+    real*8  :: d(nz, nd)   ! domain conditions
+end subroutine
+\end{verbatim}
+
+The interface decouples biogeochemical models and driver routines (ocean circulation, forcing, geometry) programmatically. It gives you the possibility to provide a free number of tracers, parameters, boundary and domain conditions. It suits well an optimization as well as an Automatic Differentiation (AD) context.
+
+%
+%	BGC Models
+%
+\section{BGC Models}
+
+Every model archive contains an \texttt{option} and a \texttt{job}
+directory. You can find examples of option files in the former
+and job files for high performance clusters in the latter.
+Use them as a starting point for your own work.
+
+%
+%	I-Cs
+%
+\subsection{I-Cs}
+
+The Iodine (I) and Caesium (Cs) model was actually implemented to show the flexibility of Metos3D.
+It was used to the predict the Caesium distribution after the Fukushima accident.
+See \href{http://www.ozean-der-zukunft.de/fukushima/}{http://www.ozean-der-zukunft.de/fukushima/}
+for more (german only).
+
+%
+%	Equations
+%
+\subsubsection{Equations}
+
+The model equations describe the radioactive decay of the $I^{131}$ and $Cs^{137}$
+isotops named $y_1$ and $y_2$, respectively. The decay depends on the
+half-life. The tracers do not react with each other. The equations read:
+\begin{align*}
+q_1(y_1, y_2)	& = \log(0.5) \, 360.0 / 8.02070 \, y_1 \\
+q_2(y_1, y_2)	& = \log(0.5) \, 1.0 / 30.17 \, y_2
+\end{align*}
+
+%
+%	N-DOP
+%
+\subsection{N-DOP}
+
+The nutrients (N) and dissolved organic phosphorous (DOP) model is a simple and
+well known one among biogeochemical modelers. It is based on the model presented
+in \cite{PaFoBo05}.
+
+%
+%	Equations
+%
+\subsubsection{Equations}
+
+The tracers are denoted by $ y = (y_1, y_2)^T = (y_{PO4}, y_{DOP})^T$.
+The biological production (the net community productivity) is calculated as a function
+$f_1$ of nutrients and light $I$. The production is limited using a 
+half saturation function, also known as Michaelis-Menten kinetics,
+and a maximum production rate parameter $\alpha$.
+%
+\begin{align*}
+f_1(y_1,I)	& = \alpha \, \frac{y_1}{y_1 + K_1} \, \frac{I}{I+K_I}
+\end{align*}
+%
+Light, here, is a portion of short wave radiation $I_{SWR}$, which is computed as a
+function of latitude and season following the astronomical formula of Paltridge and Platt \cite{PalPla76}.
+The portion depends on the photo-synthetically available radiation $\sig_{PAR}$,
+the ice cover $\sig_{ice}$ and the exponential attenuation of water.
+%
+\begin{align*}
+I		& = I_{SWR} \, \sig_{PAR} \, (1 - \sig_{ice}) \, \exp( - z \, K_{H2O} )
+\end{align*}
+%
+A fraction of the biological production $\sig_2$ remains suspended in the water column
+as dissolved organic phosphorus, which remineralizes with a rate $\lmb'_2$.
+The remainder of the production sinks as particulate to depth where it is
+remineralized according to the empirical power law relationship determined by
+Martin et al. \cite{MaKnKaBr87}. Similar descriptions for biological production can be
+found in \cite{PaFoBo05}, \cite{DuFoPa05} and \cite{YamTaj97}.
+
+Moreover the model formulation consists of a production (sun lit, euphotic) zone,
+with a depth of $l'$, and a
+noneuphotic zone, $\Om_1$ and $\Om_2$ respectively.
+The equations read
+%
+\begin{align*}
+q_1(y) & = - f_1(y_1,I)						+ \lmb'_2 \, y_2	& \text{in $\Om_1$} \\
+q_1(y) & = + \sigb_2 \, \dd_z \, F_1(y_1,I)	+ \lmb'_2 \, y_2	& \text{in $\Om_2$} \\
+ & \\
+q_2(y) & = + \sig_2 \, f_1(y_1,I)			- \lmb'_2 \, y_2	& \text{in $\Om_1$} \\
+q_2(y) & =									- \lmb'_2 \, y_2	& \text{in $\Om_2$,}
+\end{align*}
+%
+where
+%
+\begin{align*}
+F_1(y_1,I)	& = (z/l')^{-b} \int_0^{l'} \! f_1(y_1,I) \, d\xi \,.
+\end{align*}
+%
+The following table summarizes the parameters within the N-DOP model:
+\begin{center}
+\begin{tabular}{c|l|c}
+Symbol		& Description								& Unit \\ \hline
+$\alpha$		& maximum community production rate			& $ 1 / y $ \\
+$K_{H2O}$	& attenuation of water						& $ 1 / m $ \\
+$K_1$		& half saturation constant of PO4 			& $ m \, mol P / m^3 $ \\
+$K_I$		& half saturation constant of light	 		& $ W / m^2 $ \\
+$\lmb'_2$	& remineralization rate of DOP 				& $1 / d$ \\
+$\sig_2$ 	& fraction of DOP, $\sigb_2 = (1-\sig_2)$ 	& $ - $ \\
+$b$			& sinking velocity exponent					& $ - $
+\end{tabular}
+\end{center}
+
+%
+%	References	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\bibliographystyle{plain}
+%\bibliography{/Users/jpicau/Documents/ARBEIT/CODE/Literature/literature}
+\input{metos3d-model-bbl}
+
+\end{document}

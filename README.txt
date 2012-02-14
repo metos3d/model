@@ -2,7 +2,7 @@ Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
 
 -- Model --
 
-Metos3D can be coupled to every (biogeochemical) model that conforms to the Metos3D BGC API:
+Metos3D can be coupled to every (biogeochemical) model that conforms to the following interface:
 
 subroutine metos3dbgc(n, nz, m, nb, nd, dt, q, t, y, u, b, d)
     integer :: n           ! tracer count
