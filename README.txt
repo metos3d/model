@@ -23,4 +23,4 @@ The interface decouples biogeochemical models and driver routines (ocean circula
 
 -- Documentation --
 
-See the LaTeX document in the 'doc' directory for examples and more detailed information.
+Inspect the 'doc' directory for examples and more detailed information.
