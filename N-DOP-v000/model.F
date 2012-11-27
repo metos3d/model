@@ -86,7 +86,7 @@ C
         ! bc(1), latitude
         ! bc(2), ice cover
         real*8  :: insol, stau
-        call insolation(1, dt*360.d0*86400.d0, bc(1), insol, stau)
+        call insolation(1, t*360.d0*86400.d0, bc(1), insol, stau)
         insol = (1.0d0-bc(2))*biofrac*insol
 
         ! real value parameters
