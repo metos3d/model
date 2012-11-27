@@ -102,7 +102,7 @@ C
             do ilayer = 2, nlayer
                 d(ilayer) = d(ilayer-1) + dc(ilayer,1)
             end do
-            call insolation(1, dt*360.d0*86400.d0, bc(1), insol, stau)
+            call insolation(1, t*360.d0*86400.d0, bc(1), insol, stau)
             call bgcmodel(t, dt, bc(1), insol, dayfrac, bc(2), wind,
      &          ntracer, nlayer, dc(:,1), d, salt, temp, y, ybgc,
      &          nparam, u)
