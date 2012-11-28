@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
+# Copyright (C) 2012  Jaroslaw Piwonski, CAU, jpi@informatik.uni-kiel.de
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#   de.uni-kiel.rz.rzcluster.job.N-DOP.simpack.txt
+# 
+
+#PBS -N MITgcm_PO4_DOP
+#PBS -j oe
+#PBS -o work/metos3d.out
+#PBS -l walltime=200:00:00
+#PBS -l select=8:f_ocean=true:ncpus=8:mpiprocs=8:mem=4gb
+#PBS -q f_ocean
+
+. /usr/local/Modules/3.2.6/init/bash
+
+module load pgi10.0
+module load openmpi-pgi
+module list
+
+cd $PBS_O_WORKDIR
+mpirun -n 64 -machinefile $PBS_NODEFILE ./metos3d-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/de.uni-kiel.rz.rzcluster.option.N-DOP.simpack
+
+qstat -f $PBS_JOBID
+exit
