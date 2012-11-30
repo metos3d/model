@@ -23,7 +23,7 @@
 #PBS -j oe
 #PBS -o work/metos3d.out
 #PBS -l walltime=200:00:00
-#PBS -l select=8:f_ocean=true:ncpus=8:mpiprocs=8:mem=4gb
+#PBS -l select=7:f_ocean=true:ncpus=8:mpiprocs=8:mem=4gb
 #PBS -q f_ocean
 
 . /usr/local/Modules/3.2.6/init/bash
@@ -33,7 +33,7 @@ module load openmpi-pgi
 module list
 
 cd $PBS_O_WORKDIR
-mpirun -n 64 -machinefile $PBS_NODEFILE ./metos3d-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/de.uni-kiel.rz.rzcluster.option.N-DOP.simpack
+mpiexec -machinefile $PBS_NODEFILE ./metos3d-simpack-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/de.uni-kiel.rz.rzcluster.option.N-DOP.simpack.txt
 
 qstat -f $PBS_JOBID
 exit

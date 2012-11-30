@@ -19,7 +19,7 @@
 #
 
 # debug
--Metos3DDebugLevel                                  3
+-Metos3DDebugLevel                                  0
 
 # geometry
 -Metos3DGeometryType                                Profile
@@ -64,18 +64,18 @@
 -Metos3DTransportType                               Matrix
 -Metos3DMatrixInputDirectory                        /work_O2/sunip194/DATA/Metos3DData/2.8/Transport/Matrix5_4/1dt/
 -Metos3DMatrixCount                                 12
--Metos3DMatrixCount                                 1
+#-Metos3DMatrixCount                                 1
 -Metos3DMatrixExplicitFileFormat                    Ae_$02d.petsc
 -Metos3DMatrixImplicitFileFormat                    Ai_$02d.petsc
 
 # time stepping
 -Metos3DTimeStepStart                               0.0
 -Metos3DTimeStepCount                               2880
--Metos3DTimeStepCount                               1
+#-Metos3DTimeStepCount                               1
 -Metos3DTimeStep                                    0.0003472222222222
 
 # solver (PETSc)
--Metos3DSolverType                                  Newton
+#-Metos3DSolverType                                  Newton
 -Metos3DNewton_snes_type                            ls
 -Metos3DNewton_snes_ksp_ew
 -Metos3DNewton_snes_max_it                          1
@@ -91,6 +91,7 @@
 -Metos3DNewton_ksp_monitor
 
 # solver
-#-Metos3DSolverType                                  Spinup
-#-Metos3DSpinupCount                                 3000
+-Metos3DSolverType                                  Spinup
+-Metos3DSpinupCount                                 3000
+-Metos3DSpinupMonitor
 
