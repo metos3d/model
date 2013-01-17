@@ -53,9 +53,12 @@
 -Metos3DIceCoverFileFormat                          fice_$02d.petsc
 
 # bgc domain conditions
--Metos3DDomainConditionCount                        1
+-Metos3DDomainConditionCount                        2
 -Metos3DDomainConditionInputDirectory               /work_O2/sunip194/DATA/Metos3DData/2.8/Forcing/DomainCondition/
--Metos3DDomainConditionName                         LayerHeight
+-Metos3DDomainConditionName                         LayerDepth,LayerHeight
+# layer depth
+-Metos3DLayerDepthCount                             1
+-Metos3DLayerDepthFileFormat                        z.petsc
 # layer height
 -Metos3DLayerHeightCount                            1
 -Metos3DLayerHeightFileFormat                       dz.petsc
@@ -64,34 +67,15 @@
 -Metos3DTransportType                               Matrix
 -Metos3DMatrixInputDirectory                        /work_O2/sunip194/DATA/Metos3DData/2.8/Transport/Matrix5_4/1dt/
 -Metos3DMatrixCount                                 12
-#-Metos3DMatrixCount                                 1
 -Metos3DMatrixExplicitFileFormat                    Ae_$02d.petsc
 -Metos3DMatrixImplicitFileFormat                    Ai_$02d.petsc
 
 # time stepping
 -Metos3DTimeStepStart                               0.0
 -Metos3DTimeStepCount                               2880
-#-Metos3DTimeStepCount                               1
 -Metos3DTimeStep                                    0.0003472222222222
-
-# solver (PETSc)
-#-Metos3DSolverType                                  Newton
--Metos3DNewton_snes_type                            ls
--Metos3DNewton_snes_ksp_ew
--Metos3DNewton_snes_max_it                          1
--Metos3DNewton_snes_max_funcs                       1
--Metos3DNewton_snes_rtol                            1.e-5
--Metos3DNewton_snes_atol                            1.e-3
--Metos3DNewton_snes_monitor
--Metos3DNewton_snes_view
--Metos3DNewton_ksp_type                             gmres
--Metos3DNewton_ksp_max_it                           200
--Metos3DNewton_ksp_gmres_restart                    200
--Metos3DNewton_ksp_gmres_modifiedgramschmidt
--Metos3DNewton_ksp_monitor
 
 # solver
 -Metos3DSolverType                                  Spinup
 -Metos3DSpinupCount                                 3000
 -Metos3DSpinupMonitor
-

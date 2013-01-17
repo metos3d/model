@@ -16,24 +16,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#   de.uni-kiel.rz.rzcluster.job.N-DOP.simpack.txt
-# 
+#   de.hlrn.job.N-DOP.simpack.txt
+#
 
-#PBS -N PO4_DOP
+#PBS -N N_DOP
 #PBS -j oe
 #PBS -o work/metos3d.out
-#PBS -l walltime=20:00:00
-#PBS -l select=7:f_ocean=true:ncpus=8:mpiprocs=8:mem=4gb
-#PBS -q f_ocean
+#PBS -l walltime=00:05:00
+#PBS -l nodes=1:ppn=8:ice2
+#PBS -l feature=ice2
+#PBS -q testq
+#PBS -A shk00011
 
-. /usr/local/Modules/3.2.6/init/bash
-
-module load pgi10.0
-module load openmpi-pgi
-module list
+eval `/sw/swdist/bin/modulesinit`
+module load intel.compiler/11.1.073 
+module load mpt/1.26
 
 cd $PBS_O_WORKDIR
-mpiexec -machinefile $PBS_NODEFILE ./metos3d-simpack-N-DOP.exe model/N-DOP/option/de.uni-kiel.rz.rzcluster.option.N-DOP.simpack.txt
+
+mpiexec -n 8 ./metos3d-0.1-N-DOP.exe model/N-DOP/option/de.hlrn.option.N-DOP.simpack.txt
 
 qstat -f $PBS_JOBID
 exit
+

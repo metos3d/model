@@ -19,7 +19,7 @@
 #   de.uni-kiel.rz.rzcluster.job.N-DOP.simpack.txt
 # 
 
-#PBS -N PO4_DOP
+#PBS -N PO4_DOP_2
 #PBS -j oe
 #PBS -o work/metos3d.out
 #PBS -l walltime=20:00:00
@@ -33,7 +33,7 @@ module load openmpi-pgi
 module list
 
 cd $PBS_O_WORKDIR
-mpiexec -machinefile $PBS_NODEFILE ./metos3d-simpack-N-DOP.exe model/N-DOP/option/de.uni-kiel.rz.rzcluster.option.N-DOP.simpack.txt
+mpiexec -machinefile $PBS_NODEFILE ./metos3d-simpack-N-DOP-2.exe model/N-DOP-2/option/de.uni-kiel.rz.rzcluster.option.N-DOP.simpack.txt
 
 qstat -f $PBS_JOBID
 exit

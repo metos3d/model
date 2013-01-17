@@ -1,0 +1,4 @@
+v0.2rc1
+
+1. Added 'TODO.txt', 'CHNAGELOG.txt'.
+2. Added '.gitignore' files into model directories.

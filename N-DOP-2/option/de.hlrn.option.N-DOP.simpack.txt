@@ -15,15 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#   de.uni-kiel.rz.rzcluster.option.N-DOP.simpack.txt
+#   de.hlrn.option.N-DOP.simpack.txt
 #
 
 # debug
--Metos3DDebugLevel                                  0
+-Metos3DDebugLevel                                  3
 
 # geometry
 -Metos3DGeometryType                                Profile
--Metos3DProfileInputDirectory                       /work_O2/sunip194/DATA/Metos3DData/2.8/Geometry/
+-Metos3DProfileInputDirectory                       /gfs1/work/shkjpi42/DATA/Metos3DData/2.8/Geometry/
 -Metos3DProfileIndexStartFile                       gStartIndices.bin
 -Metos3DProfileIndexEndFile                         gEndIndices.bin
 
@@ -43,7 +43,7 @@
 
 # bgc boudary conditions
 -Metos3DBoundaryConditionCount                      2
--Metos3DBoundaryConditionInputDirectory             /work_O2/sunip194/DATA/Metos3DData/2.8/Forcing/BoundaryCondition/
+-Metos3DBoundaryConditionInputDirectory             /gfs1/work/shkjpi42/DATA/Metos3DData/2.8/Forcing/BoundaryCondition/
 -Metos3DBoundaryConditionName                       Latitude,IceCover
 # latitude
 # ice cover
@@ -54,7 +54,7 @@
 
 # bgc domain conditions
 -Metos3DDomainConditionCount                        1
--Metos3DDomainConditionInputDirectory               /work_O2/sunip194/DATA/Metos3DData/2.8/Forcing/DomainCondition/
+-Metos3DDomainConditionInputDirectory               /gfs1/work/shkjpi42/DATA/Metos3DData/2.8/Forcing/DomainCondition/
 -Metos3DDomainConditionName                         LayerHeight
 # layer height
 -Metos3DLayerHeightCount                            1
@@ -62,20 +62,20 @@
 
 # transport
 -Metos3DTransportType                               Matrix
--Metos3DMatrixInputDirectory                        /work_O2/sunip194/DATA/Metos3DData/2.8/Transport/Matrix5_4/1dt/
+-Metos3DMatrixInputDirectory                        /gfs1/work/shkjpi42/DATA/Metos3DData/2.8/Transport/Matrix5_4/1dt/
 -Metos3DMatrixCount                                 12
-#-Metos3DMatrixCount                                 1
+-Metos3DMatrixCount                                 1
 -Metos3DMatrixExplicitFileFormat                    Ae_$02d.petsc
 -Metos3DMatrixImplicitFileFormat                    Ai_$02d.petsc
 
 # time stepping
 -Metos3DTimeStepStart                               0.0
 -Metos3DTimeStepCount                               2880
-#-Metos3DTimeStepCount                               1
+-Metos3DTimeStepCount                               1
 -Metos3DTimeStep                                    0.0003472222222222
 
 # solver (PETSc)
-#-Metos3DSolverType                                  Newton
+-Metos3DSolverType                                  Newton
 -Metos3DNewton_snes_type                            ls
 -Metos3DNewton_snes_ksp_ew
 -Metos3DNewton_snes_max_it                          1
@@ -91,7 +91,6 @@
 -Metos3DNewton_ksp_monitor
 
 # solver
--Metos3DSolverType                                  Spinup
--Metos3DSpinupCount                                 3000
--Metos3DSpinupMonitor
+#-Metos3DSolverType                                  Spinup
+#-Metos3DSpinupCount                                 3000
 

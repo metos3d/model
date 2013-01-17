@@ -21,9 +21,8 @@
 # debug
 -Metos3DDebugLevel                                  3
 
-# geometry
 -Metos3DGeometryType                                Profile
--Metos3DProfileInputDirectory                       /Users/Shared/DATA/Metos3DData/2.8/Geometry/
+-Metos3DProfileInputDirectory                       data/Metos3DData/2.8/Geometry/
 -Metos3DProfileIndexStartFile                       gStartIndices.bin
 -Metos3DProfileIndexEndFile                         gEndIndices.bin
 
@@ -39,7 +38,7 @@
 
 # bgc boudary conditions
 -Metos3DBoundaryConditionCount                      1
--Metos3DBoundaryConditionInputDirectory             /Users/Shared/DATA/Metos3DData/2.8/Forcing/BoundaryCondition/
+-Metos3DBoundaryConditionInputDirectory             data/Metos3DData/2.8/Forcing/BoundaryCondition/
 -Metos3DBoundaryConditionName                       Fukushima
 # fukushima indicator
 -Metos3DFukushimaCount                              1
@@ -50,23 +49,23 @@
 
 # transport
 -Metos3DTransportType                               Matrix
--Metos3DMatrixInputDirectory                        /Users/Shared/DATA/Metos3DData/2.8/Transport/Matrix5_4/1dt/
+-Metos3DMatrixInputDirectory                        data/Metos3DData/2.8/Transport/Matrix5_4/1dt/
 -Metos3DMatrixCount                                 12
--Metos3DMatrixCount                                 1
+-Metos3DMatrixCount                                 2
 -Metos3DMatrixExplicitFileFormat                    Ae_$02d.petsc
 -Metos3DMatrixImplicitFileFormat                    Ai_$02d.petsc
 
 # time stepping
 -Metos3DTimeStepStart                               0.0
 -Metos3DTimeStepCount                               2880
--Metos3DTimeStepCount                               1
+-Metos3DTimeStepCount                               10
 -Metos3DTimeStep                                    0.0003472222222222
 
 # solver
 -Metos3DSolverType                                  Spinup
 -Metos3DSpinupCount                                 1000
--Metos3DSpinupCount                                 1
+-Metos3DSpinupCount                                 4
 #-Metos3DSpinupTolerance                              1.e-2
-#-Metos3DSpinupMonitor
-#-Metos3DSpinupMonitorFileFormatPrefix               sp$0004d,ts$0004d
-#-Metos3DSpinupMonitorModuloStep                     1,240
+-Metos3DSpinupMonitor
+-Metos3DSpinupMonitorFileFormatPrefix               sp$0004d,ts$0004d
+-Metos3DSpinupMonitorModuloStep                     3,4
