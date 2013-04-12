@@ -20,6 +20,16 @@
 !
 !   Model for PO4, DOP from MITgcm
 !
+!   BGC time step is now 1/8 th of ocean time step
+!
+!   CHANGE:
+!   integer istep
+!   PTRACERS_dTLev  = (dt/8.d0)*360.d0           ! bgcinit
+!   do istep = 0, 7
+!   ! point in time
+!   myTime = (t + istep*(dt/8.d0))*360.d0*86400.d0
+!   enddo
+!
 
 #include "insol.F"
 #include "phos_flux.F"
@@ -47,7 +57,7 @@
         R_NP            = 16. _d 0                   ! bgcinit
         ! used
         parfrac         = 0.4 _d 0                   ! bgcinit
-        PTRACERS_dTLev  = dt*360.d0                  ! bgcinit
+        PTRACERS_dTLev  = (dt/8.d0)*360.d0           ! bgcinit
         ! depths and heights
         ! make sure depths are: dc(:,1)
         !          heights are: dc(:,2)
@@ -84,6 +94,8 @@
 
         integer icp
 
+        integer istep
+
         ! set variables
         ! unused
         bi = 1
@@ -94,9 +106,6 @@
         jmax = 1
         myIter = 0
         myThid = 0
-
-        ! point in time
-        myTime = t*360.d0*86400.d0
 
         ! set parameters
         KDOPRemin                                   = u(1)/360.d0
@@ -137,11 +146,18 @@
             PTR_DOP(1,1,icp) = y(icp,2)
         enddo
 
+        do istep = 0, 7
+
+        ! point in time
+        myTime = (t + istep*(dt/8.d0))*360.d0*86400.d0
+
         ! call model
         call DIC_BIOTIC_FORCING( PTR_DIC, PTR_ALK, PTR_PO4,
      &                            PTR_DOP,
      &                            bi,bj,imin,imax,jmin,jmax,
      &                             myIter,myTime,myThid)
+
+        enddo
 
         ! set ybgc
         do icp = 1, nz
