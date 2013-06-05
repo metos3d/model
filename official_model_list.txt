@@ -1,5 +1,0 @@
-#
-#   Officially available models:
-#
-#   MITgcm-PO4-DOP
-#
