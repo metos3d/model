@@ -23,13 +23,11 @@
 #PBS -q f_ocean2
 
 . /usr/share/Modules/init/bash 
-. /cluster/Software/intel14/composer_xe_2013_sp1/bin/compilervars.sh intel64 
+. /cluster/Software/intel14/bin/compilervars.sh intel64 
 . /cluster/Software/intel14/impi/4.1.1.036/intel64/bin/mpivars.sh 
 module load petsc-intel14
-module list 
 
 cd $PBS_O_WORKDIR
 mpirun -n 32 -machinefile $PBS_NODEFILE ./metos3d-simpack-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/test.MITgcm-PO4-DOP.option.txt
 
 qstat -f $PBS_JOBID
-
