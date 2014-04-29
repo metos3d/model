@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#   de.uni-kiel.rz.rzcluster.option.N-DOP.simpack.txt
-#
 
 # debug
--Metos3DDebugLevel                                  0
+-Metos3DDebugLevel                                  3
 
 # geometry
 -Metos3DGeometryType                                Profile
