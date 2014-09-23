@@ -188,7 +188,8 @@
         real*8 myTime
         INTEGER myThid
 
-        real*8 PTR_ALK(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
+        real*8 CAR_S(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
+        real*8 cflux(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
 
         integer bi, bj, imin, imax, jmin, jmax
 
