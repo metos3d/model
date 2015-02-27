@@ -23,6 +23,7 @@
 %
 %	packages
 %
+\usepackage{natbib}
 \usepackage{amsmath}
 \usepackage[pdfborder={0 0 0},colorlinks,urlcolor=blue]{hyperref}
 %
@@ -67,9 +68,9 @@ Excellence Cluster The Future Ocean, Christian-Albrechts-Platz 4, 24118 Kiel, Ge
 Metos3D can be coupled to every (biogeochemical) model that conforms to the following interface:
 
 \begin{verbatim}
-subroutine metos3dbgc(n, nz, m, nb, nd, dt, q, t, y, u, b, d)
+subroutine metos3dbgc(n, ny, m, nb, nd, dt, q, t, y, u, b, d)
     integer :: n           ! tracer count
-    integer :: nz          ! layer count
+    integer :: ny          ! layer count
     integer :: m           ! parameter count
     integer :: nb          ! boundary condition count
     integer :: nd          ! domain condition count
@@ -97,20 +98,19 @@ optimization as well as an Automatic Differentiation (AD) context.
 %
 \section{BGC Models}
 
-Every model archive contains an \texttt{option} and a \texttt{job}
-directory. You can find examples of option files in the former
-and job files for high performance clusters in the latter.
-Use them as a starting point for your own work.
+Every model archive contains an \texttt{option} directory.
+%
+You can find a test option file therein.
+%
+Use it as a starting point for your own work.
 
 %
 %	I-Cs
 %
-\subsection{I-Cs}
+\subsection{\texttt{I-Cs}}
 
-The Iodine (I) and Caesium (Cs) model was actually implemented to show the flexibility of Metos3D.
-It was used to the predict the Caesium distribution after the Fukushima accident.
-See \href{http://www.ozean-der-zukunft.de/fukushima/}{http://www.ozean-der-zukunft.de/fukushima/}
-for more (german only).
+The Iodine (I) and Caesium (Cs) model was implemented to the predict
+the Caesium distribution after the Fukushima accident.
 
 %
 %	Equations
@@ -126,83 +126,104 @@ q_2(y_1, y_2)	& = \log(0.5) \, 1.0 / 30.17 \, y_2
 \end{align*}
 
 %
-%	N-DOP
+%	MITgcm-PO4-DOP
 %
-\subsection{N-DOP}
+\subsection{MITgcm-PO4-DOP}
 
-The nutrients (N) and dissolved organic phosphorous (DOP) model is a simple and
-well known one among biogeochemical modelers. It is based on the model presented
-in \cite{PaFoBo05}.
+The \texttt{MITgcm-PO4-DOP} model is an \emph{original} implementation of
+a biogeochemical model that is used for the 
+MIT General Circulation Model \citep[cf.][MITgcm]{MAHPH97}
+biogeochemistry tutorial and described in detail in
+\citep[][]{DuSoScSt05}.
+%
+The model comprises five biogeochemical variables,
+namely
+dissolved inorganic carbon (DIC),
+alkalinity (ALK),
+phosphate (PO4),
+dissolved organic phosphorous (DOP) and
+oxygen (O2).
+%
+In fact,
+just PO4 and DOP are used here since
+the concentrations of DIC, ALK and O2 are derived from those two.
 
 %
-%	Equations
-%
-\subsubsection{Equations}
-
-The tracers are denoted by $ y = (y_1, y_2)^T = (y_{PO4}, y_{DOP})^T$.
-The biological production (the net community productivity) is calculated as a function
-$f_1$ of nutrients and light $I$. The production is limited using a 
-half saturation function, also known as Michaelis-Menten kinetics,
-and a maximum production rate parameter $\alpha$.
-%
-\begin{align*}
-f_1(y_1,I)	& = \alpha \, \frac{y_1}{y_1 + K_1} \, \frac{I}{I+K_I}
-\end{align*}
-%
-Light, here, is a portion of short wave radiation $I_{SWR}$, which is computed as a
-function of latitude and season following the astronomical formula of Paltridge and Platt \cite{PalPla76}.
-The portion depends on the photo-synthetically available radiation $\sig_{PAR}$,
-the ice cover $\sig_{ice}$ and the exponential attenuation of water.
-%
-\begin{align*}
-I		& = I_{SWR} \, \sig_{PAR} \, (1 - \sig_{ice}) \, \exp( - z \, K_{H2O} )
-\end{align*}
-%
-A fraction of the biological production $\sig_2$ remains suspended in the water column
-as dissolved organic phosphorus, which remineralizes with a rate $\lmb'_2$.
-The remainder of the production sinks as particulate to depth where it is
-remineralized according to the empirical power law relationship determined by
-Martin et al. \cite{MaKnKaBr87}. Similar descriptions for biological production can be
-found in \cite{PaFoBo05}, \cite{DuFoPa05} and \cite{YamTaj97}.
-
-Moreover the model formulation consists of a production (sun lit, euphotic) zone,
-with a depth of $l'$, and a
-noneuphotic zone, $\Om_1$ and $\Om_2$ respectively.
-The equations read
-%
-\begin{align*}
-q_1(y) & = - f_1(y_1,I)						+ \lmb'_2 \, y_2	& \text{in $\Om_1$} \\
-q_1(y) & = + \sigb_2 \, \dd_z \, F_1(y_1,I)	+ \lmb'_2 \, y_2	& \text{in $\Om_2$} \\
- & \\
-q_2(y) & = + \sig_2 \, f_1(y_1,I)			- \lmb'_2 \, y_2	& \text{in $\Om_1$} \\
-q_2(y) & =									- \lmb'_2 \, y_2	& \text{in $\Om_2$,}
-\end{align*}
-%
-where
-%
-\begin{align*}
-F_1(y_1,I)	& = (z/l')^{-b} \int_0^{l'} \! f_1(y_1,I) \, d\xi \,.
-\end{align*}
-%
-The following table summarizes the parameters within the N-DOP model:
-\begin{center}
-\begin{tabular}{c|l|c}
-Symbol		& Description								& Unit \\ \hline
-$\alpha$		& maximum community production rate			& $ 1 / y $ \\
-$K_{H2O}$	& attenuation of water						& $ 1 / m $ \\
-$K_1$		& half saturation constant of PO4 			& $ m \, mol P / m^3 $ \\
-$K_I$		& half saturation constant of light	 		& $ W / m^2 $ \\
-$\lmb'_2$	& remineralization rate of DOP 				& $1 / d$ \\
-$\sig_2$ 	& fraction of DOP, $\sigb_2 = (1-\sig_2)$ 	& $ - $ \\
-$b$			& sinking velocity exponent					& $ - $
-\end{tabular}
-\end{center}
-
 %
 %	References	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \bibliographystyle{plain}
-%\bibliography{/Users/jpicau/Documents/ARBEIT/CODE/Literature/literature}
-\input{metos3d-model.bbl.tex}
+\bibliography{/Users/jpicau/Documents/ARBEIT/CODE/Literature/literature}
+%\input{metos3d-model.bbl.tex}
 
 \end{document}
+
+
+
+%
+% DUMP
+%
+
+%
+%%	Equations
+%%
+%\subsubsection{Equations}
+%
+%The tracers are denoted by $ y = (y_1, y_2)^T = (y_{PO4}, y_{DOP})^T$.
+%The biological production (the net community productivity) is calculated as a function
+%$f_1$ of nutrients and light $I$. The production is limited using a 
+%half saturation function, also known as Michaelis-Menten kinetics,
+%and a maximum production rate parameter $\alpha$.
+%%
+%\begin{align*}
+%f_1(y_1,I)	& = \alpha \, \frac{y_1}{y_1 + K_1} \, \frac{I}{I+K_I}
+%\end{align*}
+%%
+%Light, here, is a portion of short wave radiation $I_{SWR}$, which is computed as a
+%function of latitude and season following the astronomical formula of Paltridge and Platt \cite{PalPla76}.
+%The portion depends on the photo-synthetically available radiation $\sig_{PAR}$,
+%the ice cover $\sig_{ice}$ and the exponential attenuation of water.
+%%
+%\begin{align*}
+%I		& = I_{SWR} \, \sig_{PAR} \, (1 - \sig_{ice}) \, \exp( - z \, K_{H2O} )
+%\end{align*}
+%%
+%A fraction of the biological production $\sig_2$ remains suspended in the water column
+%as dissolved organic phosphorus, which remineralizes with a rate $\lmb'_2$.
+%The remainder of the production sinks as particulate to depth where it is
+%remineralized according to the empirical power law relationship determined by
+%Martin et al. \cite{MaKnKaBr87}. Similar descriptions for biological production can be
+%found in \cite{PaFoBo05}, \cite{DuFoPa05} and \cite{YamTaj97}.
+%
+%Moreover the model formulation consists of a production (sun lit, euphotic) zone,
+%with a depth of $l'$, and a
+%noneuphotic zone, $\Om_1$ and $\Om_2$ respectively.
+%The equations read
+%%
+%\begin{align*}
+%q_1(y) & = - f_1(y_1,I)						+ \lmb'_2 \, y_2	& \text{in $\Om_1$} \\
+%q_1(y) & = + \sigb_2 \, \dd_z \, F_1(y_1,I)	+ \lmb'_2 \, y_2	& \text{in $\Om_2$} \\
+% & \\
+%q_2(y) & = + \sig_2 \, f_1(y_1,I)			- \lmb'_2 \, y_2	& \text{in $\Om_1$} \\
+%q_2(y) & =									- \lmb'_2 \, y_2	& \text{in $\Om_2$,}
+%\end{align*}
+%%
+%where
+%%
+%\begin{align*}
+%F_1(y_1,I)	& = (z/l')^{-b} \int_0^{l'} \! f_1(y_1,I) \, d\xi \,.
+%\end{align*}
+%%
+%The following table summarizes the parameters within the N-DOP model:
+%\begin{center}
+%\begin{tabular}{c|l|c}
+%Symbol		& Description								& Unit \\ \hline
+%$\alpha$		& maximum community production rate			& $ 1 / y $ \\
+%$K_{H2O}$	& attenuation of water						& $ 1 / m $ \\
+%$K_1$		& half saturation constant of PO4 			& $ m \, mol P / m^3 $ \\
+%$K_I$		& half saturation constant of light	 		& $ W / m^2 $ \\
+%$\lmb'_2$	& remineralization rate of DOP 				& $1 / d$ \\
+%$\sig_2$ 	& fraction of DOP, $\sigb_2 = (1-\sig_2)$ 	& $ - $ \\
+%$b$			& sinking velocity exponent					& $ - $
+%\end{tabular}
+%\end{center}
