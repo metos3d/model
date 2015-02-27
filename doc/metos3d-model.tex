@@ -15,7 +15,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%   metos3d-model.tex
 
 %
 %	document class
@@ -48,8 +47,8 @@
 %
 \title{
 Metos3D \\
-\bigskip
-Biogeochemical Models
+\medskip
+\texttt{model}
 }
 \author{
 Jaroslaw Piwonski\thanks{\texttt{jpi@informatik.uni-kiel.de}} \,,
@@ -61,9 +60,9 @@ Excellence Cluster The Future Ocean, Christian-Albrechts-Platz 4, 24118 Kiel, Ge
 \maketitle
 
 %
-%	Introdution
+%	Model interface
 %
-\section{Introdution}
+\section{Model interface}
 
 Metos3D can be coupled to every (biogeochemical) model that conforms to the following interface:
 
@@ -84,7 +83,14 @@ subroutine metos3dbgc(n, nz, m, nb, nd, dt, q, t, y, u, b, d)
 end subroutine
 \end{verbatim}
 
-The interface decouples biogeochemical models and driver routines (ocean circulation, forcing, geometry) programmatically. It gives you the possibility to provide a free number of tracers, parameters, boundary and domain conditions. It suits well an optimization as well as an Automatic Differentiation (AD) context.
+The interface decouples biogeochemical models and driver routines
+(ocean circulation, forcing, geometry) programmatically.
+%
+It gives you the possibility to provide a free number of tracers,
+parameters, boundary and domain conditions. It suits well an
+optimization as well as an Automatic Differentiation (AD) context.
+%
+
 
 %
 %	BGC Models
@@ -197,6 +203,6 @@ $b$			& sinking velocity exponent					& $ - $
 %
 \bibliographystyle{plain}
 %\bibliography{/Users/jpicau/Documents/ARBEIT/CODE/Literature/literature}
-\input{metos3d-model-bbl}
+\input{metos3d-model.bbl.tex}
 
 \end{document}

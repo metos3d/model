@@ -1,4 +1,0 @@
-TODO
-
-1. Add 'How to implement/include your own models.'
-2. Check Docs for consistency.
