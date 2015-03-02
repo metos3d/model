@@ -38,7 +38,7 @@
 %
 %	commands
 %
-\parindent0em
+%\parindent0em
 %
 %	BEGIN DOCUMENT
 %
@@ -98,11 +98,81 @@ optimization as well as an Automatic Differentiation (AD) context.
 %
 \section{BGC Models}
 
-Every model archive contains an \texttt{option} directory.
+Generally,
+for every model implementation that
+is coupled to the transport driver via the interface
+a new executable must be compiled.
+%
+Metos3D provides an automatic compile scheme
+along with a convention for the model directory structure.
+%
+Within the \texttt{model} directory of the \texttt{model} repository
+a folder with the model name must be created.
+%
+Regarding the two models presented here,
+the directory is named \texttt{I-Cs} respectively
+\texttt{MITgcm-PO4-DOP}.
+%
+Within such a model directory a source file named
+\texttt{model.F} is stored.
+%
+Overall,
+whereas here the file suffix implies a pre-processed Fortran fixed format,
+every programming language that is supported by the PETSc library
+will be accepted.
+
+
+
+Finally,
+to compile all sources invoke
+%
+\begin{verbatim}
+$> metos3d simpack MITgcm-PO4-DOP
+\end{verbatim}
+%
+to create an executable named
+%
+\begin{verbatim}
+metos3d-simpack-MITgcm-PO4-DOP.exe
+\end{verbatim}
+%
+respectively
+%
+\begin{verbatim}
+$> metos3d simpack I-Cs
+\end{verbatim}
+%
+to create
+%
+\begin{verbatim}
+metos3d-simpack-I-Cs.exe
+\end{verbatim}
+
+
+
+Specific settings are provided via option files.
+%
+Exemplary,
+each of the two presented model archives contain an \texttt{option} directory.
 %
 You can find a test option file therein.
 %
 Use it as a starting point for your own work.
+%
+To start a test run just type:
+%
+\small
+\begin{verbatim}
+$> ./metos3d-simpack-I-Cs.exe model/I-Cs/option/test.I-Cs.option.txt
+\end{verbatim}
+%
+respectively
+%
+\begin{verbatim}
+$> ./metos3d-simpack-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/test.MITgcm-PO4-DOP.option.txt
+\end{verbatim}
+\normalsize
+
 
 %
 %	I-Cs
@@ -144,9 +214,8 @@ phosphate (PO4),
 dissolved organic phosphorous (DOP) and
 oxygen (O2).
 %
-In fact,
-just PO4 and DOP are used here since
-the concentrations of DIC, ALK and O2 are derived from those two.
+In fact, here,
+for verification just PO4 and DOP are used.
 
 %
 %
