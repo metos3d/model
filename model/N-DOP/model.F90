@@ -112,6 +112,7 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
         else
             ! export to layers below
             do k = j+1, nz
+                ! approximate derivative d/dz
                 if (k == nz) then
                     ! last layer
                     q(k, 1) = q(k, 1) + (1.d0 - sig_dop) * f_p * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
