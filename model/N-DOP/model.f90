@@ -50,7 +50,7 @@ subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
 
 end subroutine
 
-#include "insolation.f90"
+#include "insolation.F90"
 
 !
 !   N-DOP
@@ -71,7 +71,7 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
     ! compute insolation
     call insolation(t, latitude, icecover, iswr)
 
-    print *, t, latitude, icecover, iswr
+    print *, t, latitude, icecover, 0.4d0 * iswr
 
     ! euphotic zone
     do iz = 1, min(jeuphotic, nz)
