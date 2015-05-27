@@ -19,7 +19,7 @@
 !
 !   insolation
 !
-subroutine insolation(t, latitude, icecover, iswr)
+subroutine insolation(t, latitude, iswr)
     implicit none
     ! arguments
     real*8  :: t, latitude, icecover, iswr

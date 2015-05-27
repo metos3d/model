@@ -33,7 +33,7 @@
 
 # bgc parameter
 -Metos3DParameterCount                              7
--Metos3DParameterValue                              0.5,2.0,0.67,0.5,30.0,0.02,0.858
+-Metos3DParameterValue                              0.02,2.0,0.5,30.0,0.67,0.5,0.858
 
 # bgc boudary conditions
 -Metos3DBoundaryConditionCount                      2
