@@ -71,6 +71,8 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
     ! compute insolation
     call insolation(t, latitude, icecover, iswr)
 
+    print *, t, latitude, icecover, iswr
+
     ! euphotic zone
     do iz = 1, min(jeuphotic, nz)
         ! ensure positive values (or zero)
@@ -80,21 +82,6 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
 
 
     end do
-
-
-
-
-end subroutine
-
-!
-!   insolation
-!
-subroutine insolation(latitude, icecover, iswr)
-    implicit none
-    ! input variables
-    real*8 :: latitude, icecover, iswr
-
-
 
 
 

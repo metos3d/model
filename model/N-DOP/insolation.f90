@@ -21,7 +21,7 @@
 !
 subroutine insolation(t, latitude, icecover, iswr)
     implicit none
-    ! input variables
+    ! arguments
     real*8  :: t, latitude, icecover, iswr
     ! constants
     real*8, parameter :: pi = 3.141592653589793d0
