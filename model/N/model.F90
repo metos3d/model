@@ -45,17 +45,17 @@ subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
     integer :: n, nz, m, nbc, ndc
     real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
 
-    ! N-DOP model
-    call bgc_po4_dop(n, nz, m, dt, q, t, y(1,1), y(1,2), u, bc(1), bc(2), dc(1,1), dc(1,2))
+    ! N model
+    call bgc_po4(n, nz, m, dt, q, t, y(1,1), y(1,2), u, bc(1), bc(2), dc(1,1), dc(1,2))
 
 end subroutine
 
 #include "insolation.F90"
 
 !
-!   N-DOP model
+!   N model
 !
-subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, dz)
+subroutine bgc_po4(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, dz)
     implicit none
     ! input variables
     integer :: n, nz, m
@@ -77,9 +77,7 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
     mu_p    = u(2)          ! maximum groth rate        [1/d]
     k_po4   = u(3)          ! po4 half saturation       [mmolP/m^3]
     k_swr   = u(4)          ! light half satuartion     [W/m^2]
-    sig_dop = u(5)          ! fraction of dop           [1]
-    lam_dop = u(6)/360.d0   ! dop reminalization rate   [1/y]
-    b       = u(7)          ! power law coefficient     [1]
+    b       = u(5)          ! power law coefficient     [1]
 
     ! compute insolation
     call insolation(t, latitude, iswr)
@@ -90,7 +88,6 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
     do j = 1, min(jeuphotic, nz)
         ! ensure positive values (or zero)
         po4_j = max(po4(j), 0.d0)
-        dop_j = max(dop(j), 0.d0)
         ! attenaution of water
         if (j == 1) then
             ! first layer
@@ -104,40 +101,28 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
 
         ! uptake
         q(j, 1) = q(j, 1) - f_p
-        q(j, 2) = q(j, 2) + sig_dop * f_p
 
         ! remineralization of last *euphotic* layer
         if (j == nz) then
-            q(j, 1) = q(j, 1) + (1.d0 - sig_dop) * f_p
+            q(j, 1) = q(j, 1) + f_p
         else
             ! export to layers below
             do k = j+1, nz
                 ! approximate derivative d/dz
                 if (k == nz) then
                     ! last layer
-                    q(k, 1) = q(k, 1) + (1.d0 - sig_dop) * f_p * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
+                    q(k, 1) = q(k, 1) + f_p * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
                 else
                     ! layers in between
-                    q(k, 1) = q(k, 1) + (1.d0 - sig_dop) * f_p * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
+                    q(k, 1) = q(k, 1) + f_p * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
                 end if
             end do
         end if
     end do
 
-    ! all layers
-    do j = 1, nz
-        ! ensure positive values (or zero)
-        po4_j = max(po4(j), 0.d0)
-        dop_j = max(dop(j), 0.d0)
-        ! reminalization
-        q(j, 1) = q(j, 1) + lam_dop * dop_j
-        q(j, 2) = q(j, 2) - lam_dop * dop_j
-    end do
-
     ! scale with *bio* time step
     do j = 1, nz
         q(j, 1) = q(j, 1) * dt * 360.d0
-        q(j, 2) = q(j, 2) * dt * 360.d0
     end do
 
 end subroutine
