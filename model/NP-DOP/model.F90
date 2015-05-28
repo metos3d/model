@@ -63,6 +63,7 @@ subroutine bgc_po4_phy_dop(n, nz, m, dt, q, t, po4, phy, dop, u, latitude, iceco
 
     ! constants
     integer, parameter :: jeuphotic = 2
+!    real*8, parameter  :: rnp       = 16.d0                     ! Redfield ratio Nitrogen : Phosphorous
     real*8, parameter  :: sig_par   = 0.4d0                     ! photosynthetically available radiation (PAR)
     real*8, parameter  :: y_z_star  = 0.01d0                    ! [mmolP/m^3]
 
@@ -101,9 +102,11 @@ subroutine bgc_po4_phy_dop(n, nz, m, dt, q, t, po4, phy, dop, u, latitude, iceco
         if (j == 1) then
             ! first layer
             swr_j = exp(-(k_w + k_p * phy_j)* 0.5d0 * dz(j)) * iswr
+!            swr_j = exp(-(k_w + k_p * rnp * phy_j)* 0.5d0 * dz(j)) * iswr
         else
             ! other layers
             swr_j = exp(-(k_w + k_p * phy_j) * dz(j)) * swr_j
+!            swr_j = exp(-(k_w + k_p * rnp * phy_j) * dz(j)) * swr_j
         end if
         ! production
         f_p = mu_p * phy_j * po4_j / (po4_j + k_po4) * swr_j / (swr_j + k_swr)
