@@ -68,14 +68,14 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
 
     ! work vars
     integer :: j, k
-    real*8  :: yNj, yPj, yDOPj, ISWR, Ij, Ijprime, Ikm1, Ik
-    real*8  :: kw, kChl, muP, muZ, KN, KP, KI, sigmaDOP, lamdbaP, kappaP, lambdaPprime, lamdbaDOPprime, b
+    real*8  :: yNj, yPj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
+    real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaDOP, lamdbaP, kappaP, lambdaPprime, lamdbaDOPprime, b
     real*8  :: fP, fZ
     real*8  :: sigmaDOPbar, dtbio
 
     ! retrieve and scale parameters
     kw              = u(1)          ! attenuation of water                  [1/m]
-    kChl            = u(2)          ! attenuation of chlorophyl (P)         [1/m (m^3/mmolP)]
+    kc              = u(2)          ! attenuation of chlorophyl (P)         [1/m (m^3/mmolP)]
     muP             = u(3)          ! maximum groth rate P                  [1/d]
     muZ             = u(4)          ! maximum groth rate Z                  [1/d]
     KN              = u(5)          ! N half saturation                     [mmolP/m^3]
@@ -92,9 +92,9 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
     ! take PAR and ice cover into account
     ! initialize product
     call insolation(t, phi, ISWR)
-    ISWR = sigmaPAR * (1.d0 - sigmaice) * ISWR
-    Ikm1 = 1.d0
-    Ik   = 1.d0
+    ISWR  = sigmaPAR * (1.d0 - sigmaice) * ISWR
+    IPkm1 = 1.d0
+    IPk   = 1.d0
 
     ! euphotic zone
     sigmaDOPbar = (1.d0 - sigmaDOP)
@@ -109,14 +109,14 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
         ! build product for layers above current layer
         ! store value of current *full* layer
         ! set value of current *half* layer
-        Ik      = Ik * Ikm1
-        Ikm1    = exp(-(kw + kChl * yPj) * dz(j))
-        Ijprime = exp(-(kw + kChl * yPj) * 0.5d0 * dz(j))
+        IPk      = IPk * IPkm1
+        IPkm1    = exp(-(kw + kc * yPj) * dz(j))
+        IPjprime = exp(-(kw + kc * yPj) * 0.5d0 * dz(j))
         ! combine factors
-        Ij = ISWR * Ijprime * Ik
+        IPj = ISWR * IPjprime * IPk
 
         ! production
-        fP = muP * yPj * yNj / (KN + yNj) * Ij / (KI + Ij)
+        fP = muP * yPj * yNj / (KN + yNj) * IPj / (KI + IPj)
         fZ = muZ * yZstar * yPj*yPj / (KP*KP + yPj*yPj)
 
         ! uptake
