@@ -46,7 +46,7 @@ subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
     real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
 
     ! N-DOP model
-    call bgc_po4_dop(n, nz, m, dt, q, t, y(1,1), y(1,2), u, bc(1), bc(2), dc(1,1), dc(1,2))
+    call NDOPmodel(n, nz, m, dt, q, t, y(1,1), y(1,2), u, bc(1), bc(2), dc(1,1), dc(1,2))
 
 end subroutine
 
@@ -55,70 +55,79 @@ end subroutine
 !
 !   N-DOP model
 !
-subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, dz)
+subroutine NDOPmodel(n, nz, m, dt, q, t, yN, yDOP, u, phi, sigmaice, z, dz)
     implicit none
     ! input variables
     integer :: n, nz, m
-    real*8  :: dt, q(nz, n), t, po4(nz), dop(nz), u(m), latitude, icecover, z(nz), dz(nz)
+    real*8  :: dt, q(nz, n), t, yN(nz), yDOP(nz), u(m), phi, sigmaice, z(nz), dz(nz)
 
     ! constants
-    integer, parameter :: jeuphotic = 2
-    real*8, parameter  :: sig_par   = 0.4d0                     ! photosynthetically available radiation (PAR)
-    real*8, parameter  :: y_p_star  = 0.002777777777777778d0    ! [mmolP/m^3]
+    integer, parameter :: jeuphotic = 2                         ! number of euphotic layers
+    real*8, parameter  :: sigmaPAR  = 0.4d0                     ! photosynthetically available radiation (PAR)
+    real*8, parameter  :: yPstar    = 0.002777777777777778d0    ! [mmolP/m^3]
 
     ! work vars
     integer :: j, k
-    real*8  :: po4_j, dop_j, iswr, swr_j
-    real*8  :: k_w, mu_p, k_po4, k_swr, sig_dop, lam_dop, b
-    real*8  :: f_p
+    real*8  :: yNj, yDOPj, ISWR, Ij, Ijprime, Ikm1, Ik
+    real*8  :: kw, muP, KN, KI, sigmaDOP, lamdbaDOPprime, b
+    real*8  :: fP
+    real*8  :: sigmaDOPbar, dtbio
 
     ! retrieve and scale parameters
-    k_w     = u(1)          ! attenuation of water      [1/m]
-    mu_p    = u(2)          ! maximum groth rate        [1/d]
-    k_po4   = u(3)          ! po4 half saturation       [mmolP/m^3]
-    k_swr   = u(4)          ! light half satuartion     [W/m^2]
-    sig_dop = u(5)          ! fraction of dop           [1]
-    lam_dop = u(6)/360.d0   ! dop reminalization rate   [1/y]
-    b       = u(7)          ! power law coefficient     [1]
+    kw              = u(1)          ! attenuation of water      [1/m]
+    muP             = u(2)          ! maximum groth rate P      [1/d]
+    KN              = u(3)          ! N half saturation         [mmolP/m^3]
+    KI              = u(4)          ! I half satuartion         [W/m^2]
+    sigmaDOP        = u(5)          ! fraction of DOP           [1]
+    lamdbaDOPprime  = u(6)/360.d0   ! DOP reminalization rate   [1/y]
+    b               = u(7)          ! power law coefficient     [1]
 
     ! compute insolation
-    call insolation(t, latitude, iswr)
-    ! take photosynthetically available radiation and ice cover into account
-    iswr = sig_par * (1.d0 - icecover) * iswr
+    ! take PAR and ice cover into account
+    ! initialize product
+    call insolation(t, phi, ISWR)
+    ISWR = sigmaPAR * (1.d0 - sigmaice) * ISWR
+    Ikm1 = 1.d0
+    Ik   = 1.d0
 
     ! euphotic zone
+    sigmaDOPbar = (1.d0 - sigmaDOP)
     do j = 1, min(jeuphotic, nz)
+
         ! ensure positive values (or zero)
-        po4_j = max(po4(j), 0.d0)
-        dop_j = max(dop(j), 0.d0)
+        yNj   = max(yN(j), 0.d0)
+        yDOPj = max(yDOP(j), 0.d0)
+
         ! attenaution of water
-        if (j == 1) then
-            ! first layer
-            swr_j = exp(-k_w * 0.5d0 * dz(j)) * iswr
-        else
-            ! other layers
-            swr_j = exp(-k_w * (z(j-1) + 0.5d0 * dz(j))) * iswr
-        end if
+        ! build product for layers above current layer
+        ! store value of current *full* layer
+        ! set value of current *half* layer
+        Ik      = Ik * Ikm1
+        Ikm1    = exp(-kw * dz(j))
+        Ijprime = exp(-kw * 0.5d0 * dz(j))
+        ! combine factors
+        Ij = ISWR * Ijprime * Ik
+
         ! production
-        f_p = mu_p * y_p_star * po4_j / (po4_j + k_po4) * swr_j / (swr_j + k_swr)
+        fP = muP * yPstar * yNj / (KN + yNj) * Ij / (KI + Ij)
 
         ! uptake
-        q(j, 1) = q(j, 1) - f_p
-        q(j, 2) = q(j, 2) + sig_dop * f_p
+        q(j, 1) = q(j, 1) - fP
+        q(j, 2) = q(j, 2) + sigmaDOP * fP
 
         ! remineralization of last *euphotic* layer
         if (j == nz) then
-            q(j, 1) = q(j, 1) + (1.d0 - sig_dop) * f_p
+            q(j, 1) = q(j, 1) + sigmaDOPbar * fP
         else
             ! export to layers below
             do k = j+1, nz
                 ! approximate derivative d/dz
                 if (k == nz) then
                     ! last layer
-                    q(k, 1) = q(k, 1) + (1.d0 - sig_dop) * f_p * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
+                    q(k, 1) = q(k, 1) + sigmaDOPbar * fP * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
                 else
                     ! layers in between
-                    q(k, 1) = q(k, 1) + (1.d0 - sig_dop) * f_p * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
+                    q(k, 1) = q(k, 1) + sigmaDOPbar * fP * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
                 end if
             end do
         end if
@@ -127,17 +136,18 @@ subroutine bgc_po4_dop(n, nz, m, dt, q, t, po4, dop, u, latitude, icecover, z, d
     ! all layers
     do j = 1, nz
         ! ensure positive values (or zero)
-        po4_j = max(po4(j), 0.d0)
-        dop_j = max(dop(j), 0.d0)
+        yNj   = max(yN(j), 0.d0)
+        yDOPj = max(yDOP(j), 0.d0)
         ! reminalization
-        q(j, 1) = q(j, 1) + lam_dop * dop_j
-        q(j, 2) = q(j, 2) - lam_dop * dop_j
+        q(j, 1) = q(j, 1) + lamdbaDOPprime * yDOPj
+        q(j, 2) = q(j, 2) - lamdbaDOPprime * yDOPj
     end do
 
     ! scale with *bio* time step
+    dtbio = dt * 360.d0
     do j = 1, nz
-        q(j, 1) = q(j, 1) * dt * 360.d0
-        q(j, 2) = q(j, 2) * dt * 360.d0
+        q(j, 1) = q(j, 1) * dtbio
+        q(j, 2) = q(j, 2) * dtbio
     end do
 
 end subroutine
