@@ -45,33 +45,34 @@ subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
     integer :: n, nz, m, nbc, ndc
     real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
 
-    ! NP-DOP model
-    call NPDOPmodel(n, nz, m, dt, q, t, y(1,1), y(1,2), y(1,3), u, bc(1), bc(2), dc(1,1), dc(1,2))
+    ! NPZ-DOP model
+    call NPZDOPmodel(n, nz, m, dt, q, t, y(1,1), y(1,2), y(1,3), y(1,4), u, bc(1), bc(2), dc(1,1), dc(1,2))
 
 end subroutine
 
 #include "insolation.F90"
 
 !
-!   NP-DOP model
+!   NPZ-DOP model
 !
-subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
+subroutine NPZDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yDOP, u, phi, sigmaice, z, dz)
     implicit none
     ! input variables
     integer :: n, nz, m
-    real*8  :: dt, q(nz, n), t, yN(nz), yP(nz), yDOP(nz), u(m), phi, sigmaice, z(nz), dz(nz)
+    real*8  :: dt, q(nz, n), t, yN(nz), yP(nz), yZ(nz), yDOP(nz), u(m), phi, sigmaice, z(nz), dz(nz)
 
     ! constants
     integer, parameter :: jeuphotic = 2                         ! number of euphotic layers
     real*8, parameter  :: sigmaPAR  = 0.4d0                     ! photosynthetically available radiation (PAR)
-    real*8, parameter  :: yZstar    = 0.01d0                    ! [mmolP/m^3]
 
     ! work vars
     integer :: j, k
-    real*8  :: yNj, yPj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
-    real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaDOP, lamdbaP, kappaP, lambdaPprime, lamdbaDOPprime, b
+    real*8  :: yNj, yPj, yZj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
+    real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaZ, sigmaDOP
+    real*8  :: lamdbaP, lambdaZ, kappaZ, lambdaPprime, lambdaZprime, lamdbaDOPprime, b
     real*8  :: fP, fZ
-    real*8  :: sigmaDOPbar, dtbio
+    real*8  :: sigmaDOPbar, sigmaZbar, dtbio
+    real*8  :: export
 
     ! retrieve and scale parameters
     kw              = u(1)          ! attenuation of water                  [1/m]
@@ -80,13 +81,16 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
     muZ             = u(4)          ! maximum groth rate Z                  [1/d]
     KN              = u(5)          ! N half saturation                     [mmolP/m^3]
     KP              = u(6)          ! P half saturation                     [mmolP/m^3]
-    KI              = u(7)          ! I half satuartion                     [W/m^2]
-    sigmaDOP        = u(8)          ! fraction of DOP                       [1]
-    lamdbaP         = u(9)          ! linear loss rate P (euphotic)         [1/d]
-    kappaP          = u(10)         ! quadratic loss rate P (euphotic)      [1/d (m^3/mmolP)]
-    lambdaPprime    = u(11)         ! linear loss rate Z (all layers)       [1/d]
-    lamdbaDOPprime  = u(12)/360.d0  ! DOP reminalization rate (all layers)  [1/y]
-    b               = u(13)         ! power law coefficient                 [1]
+    KI              = u(7)          ! light half satuartion                 [W/m^2]
+    sigmaZ          = u(8)          ! fraction of Z                         [1]
+    sigmaDOP        = u(9)          ! fraction of DOP                       [1]
+    lamdbaP         = u(10)         ! linear loss rate P (euphotic)         [1/d]
+    lambdaZ         = u(11)         ! linear loss rate Z (euphotic)         [1/d]
+    kappaZ          = u(12)         ! quadratic loss rate Z (euphotic)      [1/d (m^3/mmolP)]
+    lambdaPprime    = u(13)         ! linear loss rate P (all layers)       [1/d]
+    lambdaZprime    = u(14)         ! linear loss rate Z (all layers)       [1/d]
+    lamdbaDOPprime  = u(15)/360.d0  ! DOP reminalization rate (all layers)  [1/y]
+    b               = u(16)         ! power law coefficient                 [1]
 
     ! compute insolation
     ! take PAR and ice cover into account
@@ -98,11 +102,13 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
 
     ! euphotic zone
     sigmaDOPbar = (1.d0 - sigmaDOP)
+    sigmaZbar   = (1.d0 - sigmaZ)
     do j = 1, min(jeuphotic, nz)
 
         ! ensure positive values (or zero)
         yNj   = max(yN(j), 0.d0)
         yPj   = max(yP(j), 0.d0)
+        yZj   = max(yZ(j), 0.d0)
         yDOPj = max(yDOP(j), 0.d0)
 
         ! attenaution of water
@@ -117,26 +123,28 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
 
         ! production
         fP = muP * yPj * yNj / (KN + yNj) * IPj / (KI + IPj)
-        fZ = muZ * yZstar * yPj*yPj / (KP*KP + yPj*yPj)
+        fZ = muZ * yZj * yPj*yPj / (KP*KP + yPj*yPj)
 
         ! uptake
-        q(j, 1) = q(j, 1) - fP
-        q(j, 2) = q(j, 2) + fP - fZ            - lamdbaP * yPj - kappaP * yPj*yPj
-        q(j, 3) = q(j, 3)      + sigmaDOP * fZ + lamdbaP * yPj + kappaP * yPj*yPj
+        q(j, 1) = q(j, 1) - fP                                              + lambdaZ * yZj
+        q(j, 2) = q(j, 2) + fP - fZ                         - lamdbaP * yPj
+        q(j, 3) = q(j, 3)      + sigmaZ * fZ                                - lambdaZ * yZj - kappaZ * yZj*yZj
+        q(j, 4) = q(j, 4)      + sigmaDOP * (sigmaZbar * fZ + lamdbaP * yPj                 + kappaZ * yZj*yZj)
 
         ! remineralization of last *euphotic* layer
+        export = sigmaDOPbar * (sigmaZbar * fZ + lamdbaP * yPj + kappaZ * yZj*yZj)
         if (j == nz) then
-            q(j, 1) = q(j, 1) + sigmaDOPbar * fZ
+            q(j, 1) = q(j, 1) + export
         else
             ! export to layers below
             do k = j+1, nz
                 ! approximate derivative d/dz
                 if (k == nz) then
                     ! last layer
-                    q(k, 1) = q(k, 1) + sigmaDOPbar * fZ * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
+                    q(k, 1) = q(k, 1) + export * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
                 else
                     ! layers in between
-                    q(k, 1) = q(k, 1) + sigmaDOPbar * fZ * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
+                    q(k, 1) = q(k, 1) + export * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
                 end if
             end do
         end if
@@ -147,11 +155,13 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
         ! ensure positive values (or zero)
         yNj   = max(yN(j), 0.d0)
         yPj   = max(yP(j), 0.d0)
+        yZj   = max(yZ(j), 0.d0)
         yDOPj = max(yDOP(j), 0.d0)
         ! reminalization
-        q(j, 1) = q(j, 1)                      + lamdbaDOPprime * yDOPj
+        q(j, 1) = q(j, 1)                                           + lamdbaDOPprime * yDOPj
         q(j, 2) = q(j, 2) - lambdaPprime * yPj
-        q(j, 3) = q(j, 3) + lambdaPprime * yPj - lamdbaDOPprime * yDOPj
+        q(j, 3) = q(j, 3)                      - lambdaZprime * yZj
+        q(j, 4) = q(j, 4) + lambdaPprime * yPj + lambdaZprime * yZj - lamdbaDOPprime * yDOPj
     end do
 
     ! scale with *bio* time step
@@ -160,6 +170,7 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
         q(j, 1) = q(j, 1) * dtbio
         q(j, 2) = q(j, 2) * dtbio
         q(j, 3) = q(j, 3) * dtbio
+        q(j, 4) = q(j, 4) * dtbio
     end do
 
 end subroutine
