@@ -70,7 +70,7 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
     integer :: j, k
     real*8  :: yNj, yPj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
     real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaDOP, lamdbaP, kappaP, lambdaPprime, lamdbaDOPprime, b
-    real*8  :: fP, fZ
+    real*8  :: fP, fZ, E
     real*8  :: sigmaDOPbar, dtbio
 
     ! retrieve and scale parameters
@@ -125,18 +125,19 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
         q(j, 3) = q(j, 3)      + sigmaDOP * fZ + lamdbaP * yPj + kappaP * yPj*yPj
 
         ! remineralization of last *euphotic* layer
+        E = sigmaDOPbar * fZ
         if (j == nz) then
-            q(j, 1) = q(j, 1) + sigmaDOPbar * fZ
+            q(j, 1) = q(j, 1) + E
         else
             ! export to layers below
             do k = j+1, nz
                 ! approximate derivative d/dz
                 if (k == nz) then
                     ! last layer
-                    q(k, 1) = q(k, 1) + sigmaDOPbar * fZ * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
+                    q(k, 1) = q(k, 1) + E * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
                 else
                     ! layers in between
-                    q(k, 1) = q(k, 1) + sigmaDOPbar * fZ * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
+                    q(k, 1) = q(k, 1) + E * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
                 end if
             end do
         end if
