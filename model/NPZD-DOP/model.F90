@@ -143,13 +143,13 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
     do j = 1, nz-1
         ! sinking speed
         ! D concentration
-        wj  = aD * 0.5d0 * (z(j-1) + z(j)) + bD
+        wj  = aD * (z(j) - 0.5d0 * dz(j)) + bD
         yDj = max(yD(j), 0.d0)
         ! flux difference
         q(j, 4) = q(j, 4) + (wjm1*yDjm1 - wj*yDj)/dz(j)
         ! shift
         wjm1  = wj
-        yDjm1 = yDjm1
+        yDjm1 = yDj
     end do
     ! last layer
     q(nz, 4) = q(nz, 4) + wjm1*yDjm1/dz(nz)
