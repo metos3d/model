@@ -70,7 +70,7 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
     real*8  :: yNj, yPj, yZj, yDj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
     real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaZ, sigmaDOP
     real*8  :: lamdbaP, lambdaZ, kappaZ, lambdaPprime, lambdaZprime, lambdaDprime, lamdbaDOPprime, aD, bD
-    real*8  :: fP, fZ, E
+    real*8  :: fP, fZ, wjm1, yDjm1, wj
     real*8  :: sigmaDOPbar, sigmaZbar, dtbio
 
     ! retrieve and scale parameters
@@ -134,28 +134,25 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
         q(j, 4) = q(j, 4)      + sigmaDOPbar * (sigmaZbar * fZ + lamdbaP * yPj                 + kappaZ * yZj*yZj)
         q(j, 5) = q(j, 5)      + sigmaDOP *    (sigmaZbar * fZ + lamdbaP * yPj                 + kappaZ * yZj*yZj)
 
-! ---
-
-        ! remineralization of last *euphotic* layer
-        E = sigmaDOPbar * (sigmaZbar * fZ + lamdbaP * yPj + kappaZ * yZj*yZj)
-        if (j == nz) then
-            q(j, 1) = q(j, 1) + E
-        else
-            ! export to layers below
-            do k = j+1, nz
-                ! approximate derivative d/dz
-                if (k == nz) then
-                    ! last layer
-                    q(k, 1) = q(k, 1) + E * dz(j) * (z(k-1)/z(j))**(-b) / dz(k)
-                else
-                    ! layers in between
-                    q(k, 1) = q(k, 1) + E * dz(j) * ((z(k-1)/z(j))**(-b) - (z(k)/z(j))**(-b)) / dz(k)
-                end if
-            end do
-        end if
     end do
 
-! ---
+    ! D sinking
+    ! init
+    wjm1  = 0.d0
+    yDjm1 = 0.d0
+    do j = 1, nz-1
+        ! sinking speed
+        ! D concentration
+        wj  = aD * 0.5d0 * (z(j-1) + z(j)) + bD
+        yDj = max(yD(j), 0.d0)
+        ! flux difference
+        q(j, 4) = q(j, 4) + (wjm1*yDjm1 - wj*yDj)/dz(j)
+        ! shift
+        wjm1  = wj
+        yDjm1 = yDjm1
+    end do
+    ! last layer
+    q(nz, 4) = q(nz, 4) + wjm1*yDjm1/dz(nz)
 
     ! all layers
     do j = 1, nz
@@ -163,6 +160,7 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
         yNj   = max(yN(j), 0.d0)
         yPj   = max(yP(j), 0.d0)
         yZj   = max(yZ(j), 0.d0)
+        yDj   = max(yD(j), 0.d0)
         yDOPj = max(yDOP(j), 0.d0)
         ! reminalization
         q(j, 1) = q(j, 1)                                           + lambdaDprime * yDj + lamdbaDOPprime * yDOPj
