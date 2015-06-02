@@ -69,7 +69,7 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
     ! work vars
     integer :: j, k
     real*8  :: yNj, yPj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
-    real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaDOP, lamdbaP, kappaP, lambdaPprime, lamdbaDOPprime, b
+    real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaDOP, lambdaP, kappaP, lambdaPprime, lambdaDOPprime, b
     real*8  :: fP, fZ, E
     real*8  :: sigmaDOPbar, dtbio
 
@@ -82,10 +82,10 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
     KP              = u(6)          ! P half saturation                     [mmolP/m^3]
     KI              = u(7)          ! I half satuartion                     [W/m^2]
     sigmaDOP        = u(8)          ! fraction of DOP                       [1]
-    lamdbaP         = u(9)          ! linear loss rate P (euphotic)         [1/d]
+    lambdaP         = u(9)          ! linear loss rate P (euphotic)         [1/d]
     kappaP          = u(10)         ! quadratic loss rate P (euphotic)      [1/d (m^3/mmolP)]
     lambdaPprime    = u(11)         ! linear loss rate Z (all layers)       [1/d]
-    lamdbaDOPprime  = u(12)/360.d0  ! DOP reminalization rate (all layers)  [1/y]
+    lambdaDOPprime  = u(12)/360.d0  ! DOP reminalization rate (all layers)  [1/y]
     b               = u(13)         ! power law coefficient                 [1]
 
     ! compute insolation
@@ -121,8 +121,8 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
 
         ! uptake
         q(j, 1) = q(j, 1) - fP
-        q(j, 2) = q(j, 2) + fP - fZ            - lamdbaP * yPj - kappaP * yPj*yPj
-        q(j, 3) = q(j, 3)      + sigmaDOP * fZ + lamdbaP * yPj + kappaP * yPj*yPj
+        q(j, 2) = q(j, 2) + fP - fZ            - lambdaP * yPj - kappaP * yPj*yPj
+        q(j, 3) = q(j, 3)      + sigmaDOP * fZ + lambdaP * yPj + kappaP * yPj*yPj
 
         ! remineralization of last *euphotic* layer
         E = sigmaDOPbar * fZ
@@ -150,9 +150,9 @@ subroutine NPDOPmodel(n, nz, m, dt, q, t, yN, yP, yDOP, u, phi, sigmaice, z, dz)
         yPj   = max(yP(j), 0.d0)
         yDOPj = max(yDOP(j), 0.d0)
         ! reminalization
-        q(j, 1) = q(j, 1)                      + lamdbaDOPprime * yDOPj
+        q(j, 1) = q(j, 1)                      + lambdaDOPprime * yDOPj
         q(j, 2) = q(j, 2) - lambdaPprime * yPj
-        q(j, 3) = q(j, 3) + lambdaPprime * yPj - lamdbaDOPprime * yDOPj
+        q(j, 3) = q(j, 3) + lambdaPprime * yPj - lambdaDOPprime * yDOPj
     end do
 
     ! scale with *bio* time step

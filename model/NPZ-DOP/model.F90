@@ -69,7 +69,7 @@ subroutine NPZDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yDOP, u, phi, sigmaice, z
     integer :: j, k
     real*8  :: yNj, yPj, yZj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
     real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaZ, sigmaDOP
-    real*8  :: lamdbaP, lambdaZ, kappaZ, lambdaPprime, lambdaZprime, lamdbaDOPprime, b
+    real*8  :: lambdaP, lambdaZ, kappaZ, lambdaPprime, lambdaZprime, lambdaDOPprime, b
     real*8  :: fP, fZ, E
     real*8  :: sigmaDOPbar, sigmaZbar, dtbio
 
@@ -83,12 +83,12 @@ subroutine NPZDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yDOP, u, phi, sigmaice, z
     KI              = u(7)          ! light half satuartion                 [W/m^2]
     sigmaZ          = u(8)          ! fraction of Z                         [1]
     sigmaDOP        = u(9)          ! fraction of DOP                       [1]
-    lamdbaP         = u(10)         ! linear loss rate P (euphotic)         [1/d]
+    lambdaP         = u(10)         ! linear loss rate P (euphotic)         [1/d]
     lambdaZ         = u(11)         ! linear loss rate Z (euphotic)         [1/d]
     kappaZ          = u(12)         ! quadratic loss rate Z (euphotic)      [1/d (m^3/mmolP)]
     lambdaPprime    = u(13)         ! linear loss rate P (all layers)       [1/d]
     lambdaZprime    = u(14)         ! linear loss rate Z (all layers)       [1/d]
-    lamdbaDOPprime  = u(15)/360.d0  ! DOP reminalization rate (all layers)  [1/y]
+    lambdaDOPprime  = u(15)/360.d0  ! DOP reminalization rate (all layers)  [1/y]
     b               = u(16)         ! power law coefficient                 [1]
 
     ! compute insolation
@@ -126,12 +126,12 @@ subroutine NPZDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yDOP, u, phi, sigmaice, z
 
         ! uptake
         q(j, 1) = q(j, 1) - fP                                              + lambdaZ * yZj
-        q(j, 2) = q(j, 2) + fP - fZ                         - lamdbaP * yPj
+        q(j, 2) = q(j, 2) + fP - fZ                         - lambdaP * yPj
         q(j, 3) = q(j, 3)      + sigmaZ * fZ                                - lambdaZ * yZj - kappaZ * yZj*yZj
-        q(j, 4) = q(j, 4)      + sigmaDOP * (sigmaZbar * fZ + lamdbaP * yPj                 + kappaZ * yZj*yZj)
+        q(j, 4) = q(j, 4)      + sigmaDOP * (sigmaZbar * fZ + lambdaP * yPj                 + kappaZ * yZj*yZj)
 
         ! remineralization of last *euphotic* layer
-        E = sigmaDOPbar * (sigmaZbar * fZ + lamdbaP * yPj + kappaZ * yZj*yZj)
+        E = sigmaDOPbar * (sigmaZbar * fZ + lambdaP * yPj + kappaZ * yZj*yZj)
         if (j == nz) then
             q(j, 1) = q(j, 1) + E
         else
@@ -157,10 +157,10 @@ subroutine NPZDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yDOP, u, phi, sigmaice, z
         yZj   = max(yZ(j), 0.d0)
         yDOPj = max(yDOP(j), 0.d0)
         ! reminalization
-        q(j, 1) = q(j, 1)                                           + lamdbaDOPprime * yDOPj
+        q(j, 1) = q(j, 1)                                           + lambdaDOPprime * yDOPj
         q(j, 2) = q(j, 2) - lambdaPprime * yPj
         q(j, 3) = q(j, 3)                      - lambdaZprime * yZj
-        q(j, 4) = q(j, 4) + lambdaPprime * yPj + lambdaZprime * yZj - lamdbaDOPprime * yDOPj
+        q(j, 4) = q(j, 4) + lambdaPprime * yPj + lambdaZprime * yZj - lambdaDOPprime * yDOPj
     end do
 
     ! scale with *bio* time step

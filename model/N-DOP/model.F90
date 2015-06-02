@@ -69,7 +69,7 @@ subroutine NDOPmodel(n, nz, m, dt, q, t, yN, yDOP, u, phi, sigmaice, z, dz)
     ! work vars
     integer :: j, k
     real*8  :: yNj, yDOPj, ISWR, Ij, Ijprime, Ikm1, Ik
-    real*8  :: kw, muP, KN, KI, sigmaDOP, lamdbaDOPprime, b
+    real*8  :: kw, muP, KN, KI, sigmaDOP, lambdaDOPprime, b
     real*8  :: fP, E
     real*8  :: sigmaDOPbar, dtbio
 
@@ -79,7 +79,7 @@ subroutine NDOPmodel(n, nz, m, dt, q, t, yN, yDOP, u, phi, sigmaice, z, dz)
     KN              = u(3)          ! N half saturation         [mmolP/m^3]
     KI              = u(4)          ! I half satuartion         [W/m^2]
     sigmaDOP        = u(5)          ! fraction of DOP           [1]
-    lamdbaDOPprime  = u(6)/360.d0   ! DOP reminalization rate   [1/y]
+    lambdaDOPprime  = u(6)/360.d0   ! DOP reminalization rate   [1/y]
     b               = u(7)          ! power law coefficient     [1]
 
     ! compute insolation
@@ -140,8 +140,8 @@ subroutine NDOPmodel(n, nz, m, dt, q, t, yN, yDOP, u, phi, sigmaice, z, dz)
         yNj   = max(yN(j), 0.d0)
         yDOPj = max(yDOP(j), 0.d0)
         ! reminalization
-        q(j, 1) = q(j, 1) + lamdbaDOPprime * yDOPj
-        q(j, 2) = q(j, 2) - lamdbaDOPprime * yDOPj
+        q(j, 1) = q(j, 1) + lambdaDOPprime * yDOPj
+        q(j, 2) = q(j, 2) - lambdaDOPprime * yDOPj
     end do
 
     ! scale with *bio* time step

@@ -69,7 +69,7 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
     integer :: j, k
     real*8  :: yNj, yPj, yZj, yDj, yDOPj, ISWR, IPj, IPjprime, IPkm1, IPk
     real*8  :: kw, kc, muP, muZ, KN, KP, KI, sigmaZ, sigmaDOP
-    real*8  :: lamdbaP, lambdaZ, kappaZ, lambdaPprime, lambdaZprime, lambdaDprime, lamdbaDOPprime, aD, bD
+    real*8  :: lambdaP, lambdaZ, kappaZ, lambdaPprime, lambdaZprime, lambdaDprime, lambdaDOPprime, aD, bD
     real*8  :: fP, fZ, wjm1, yDjm1, wj
     real*8  :: sigmaDOPbar, sigmaZbar, dtbio
 
@@ -83,13 +83,13 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
     KI              = u(7)          ! light half satuartion                     [W/m^2]
     sigmaZ          = u(8)          ! fraction of Z                             [1]
     sigmaDOP        = u(9)          ! fraction of DOP                           [1]
-    lamdbaP         = u(10)         ! linear loss rate P (euphotic)             [1/d]
+    lambdaP         = u(10)         ! linear loss rate P (euphotic)             [1/d]
     lambdaZ         = u(11)         ! linear loss rate Z (euphotic)             [1/d]
     kappaZ          = u(12)         ! quadratic loss rate Z (euphotic)          [1/d (m^3/mmolP)]
     lambdaPprime    = u(13)         ! linear loss rate P (all layers)           [1/d]
     lambdaZprime    = u(14)         ! linear loss rate Z (all layers)           [1/d]
     lambdaDprime    = u(15)         ! linear lass rate D (all layers)           [1/d]
-    lamdbaDOPprime  = u(16)/360.d0  ! DOP reminalization rate (all layers)      [1/y]
+    lambdaDOPprime  = u(16)/360.d0  ! DOP reminalization rate (all layers)      [1/y]
     aD              = u(17)         ! increase of sinking speed w.r.t. depth    [1/d]
     bD              = u(18)         ! initial sinking speed                     [m/d]
 
@@ -129,10 +129,10 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
 
         ! uptake
         q(j, 1) = q(j, 1) - fP                                                 + lambdaZ * yZj
-        q(j, 2) = q(j, 2) + fP - fZ                            - lamdbaP * yPj
+        q(j, 2) = q(j, 2) + fP - fZ                            - lambdaP * yPj
         q(j, 3) = q(j, 3)      + sigmaZ * fZ                                   - lambdaZ * yZj - kappaZ * yZj*yZj
-        q(j, 4) = q(j, 4)      + sigmaDOPbar * (sigmaZbar * fZ + lamdbaP * yPj                 + kappaZ * yZj*yZj)
-        q(j, 5) = q(j, 5)      + sigmaDOP *    (sigmaZbar * fZ + lamdbaP * yPj                 + kappaZ * yZj*yZj)
+        q(j, 4) = q(j, 4)      + sigmaDOPbar * (sigmaZbar * fZ + lambdaP * yPj                 + kappaZ * yZj*yZj)
+        q(j, 5) = q(j, 5)      + sigmaDOP *    (sigmaZbar * fZ + lambdaP * yPj                 + kappaZ * yZj*yZj)
 
     end do
 
@@ -163,11 +163,11 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
         yDj   = max(yD(j), 0.d0)
         yDOPj = max(yDOP(j), 0.d0)
         ! reminalization
-        q(j, 1) = q(j, 1)                                           + lambdaDprime * yDj + lamdbaDOPprime * yDOPj
+        q(j, 1) = q(j, 1)                                           + lambdaDprime * yDj + lambdaDOPprime * yDOPj
         q(j, 2) = q(j, 2) - lambdaPprime * yPj
         q(j, 3) = q(j, 3)                      - lambdaZprime * yZj
         q(j, 4) = q(j, 4)                                           - lambdaDprime * yDj
-        q(j, 5) = q(j, 5) + lambdaPprime * yPj + lambdaZprime * yZj                      - lamdbaDOPprime * yDOPj
+        q(j, 5) = q(j, 5) + lambdaPprime * yPj + lambdaZprime * yZj                      - lambdaDOPprime * yDOPj
     end do
 
     ! scale with *bio* time step
