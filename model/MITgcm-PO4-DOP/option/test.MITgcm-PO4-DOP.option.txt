@@ -22,6 +22,10 @@
 # geometry
 -Metos3DGeometryType                                Profile
 -Metos3DProfileInputDirectory                       data/TMM/2.8/Geometry/
+# new in v0.3+
+-Metos3DProfileMaskFile                             landSeaMask.petsc
+-Metos3DProfileVolumeFile                           volumes.petsc
+# v0.2, will be deprecated in the future
 -Metos3DProfileIndexStartFile                       gStartIndices.bin
 -Metos3DProfileIndexEndFile                         gEndIndices.bin
 
