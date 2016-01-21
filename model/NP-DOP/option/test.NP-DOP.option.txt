@@ -79,6 +79,7 @@
 -Metos3DSolverType                                  Spinup
 #-Metos3DSpinupCount                                 3000
 -Metos3DSpinupCount                                 1
+-Metos3DSpinupUseScaledNorm
 -Metos3DSpinupMonitor
 
 ## solver (PETSc)
