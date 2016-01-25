@@ -78,5 +78,15 @@
 -Metos3DSolverType                                  Spinup
 #-Metos3DSpinupCount                                 3000
 -Metos3DSpinupCount                                 1
--Metos3DSpinupUseScaledNorm
 -Metos3DSpinupMonitor
+
+## solver (PETSc)
+#-Metos3DSolverType                                  Newton
+#-Metos3DNewton_snes_type                            ls
+#-Metos3DNewton_snes_view
+#-Metos3DNewton_snes_ksp_ew
+#-Metos3DNewton_snes_monitor
+#-Metos3DNewton_snes_linesearch_monitor
+#-Metos3DNewton_ksp_type                             gmres
+#-Metos3DNewton_ksp_monitor
+#-Metos3DNewton_ksp_view
