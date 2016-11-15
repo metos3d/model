@@ -2,4 +2,4 @@
 
 See the 'doc' directory for a documentation.
 
-To install Metos3D please visit: http://metos3d.github.com/metos3d/
+To install Metos3D please visit: https://metos3d.github.io/
