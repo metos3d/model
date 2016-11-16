@@ -16,6 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+v0.3.3
+- updated README and CHANGELOG
+
 v0.3
 - added N, N-DOP, NP-DOP, NPZ-DOP, NPZD-DOP models
 
