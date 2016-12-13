@@ -1,0 +1,113 @@
+#
+# Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
+# Copyright (C) 2014  Jaroslaw Piwonski, CAU, jpi@informatik.uni-kiel.de
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# debug
+-Metos3DDebugLevel                                  3
+
+# geometry
+-Metos3DGeometryType                                Profile
+-Metos3DProfileInputDirectory                       data/TMM/2.8/Geometry/
+# land sea mask and volumes
+-Metos3DProfileMaskFile                             landSeaMask.petsc
+-Metos3DProfileVolumeFile                           volumes.petsc
+
+# initial conditions from:
+#   https://github.com/samarkhatiwala/tmm/tree/master/models/current/mops2.0/matlab/make_input_files_for_mops_model.m
+#
+#   PO4=repmat(2.17,[nb 1]); % [mmol P/m3]
+#   DOP=repmat(1e-4,[nb 1]); % [mmol P/m3]
+#   OXY=repmat(300.0,[nb 1]); % [mmol O2/m3]
+#   PHY=repmat(1e-4,[nb 1]); % [mmol P/m3]
+#   ZOO=repmat(1e-4,[nb 1]); % [mmol P/m3]
+#   DET=repmat(1e-4,[nb 1]); % [mmol P/m3]
+#   NO3=repmat(31.23,[nb 1]); % [mmol N/m3]
+#
+# bgc tracer
+-Metos3DTracerCount                                 7
+-Metos3DTracerInitValue                             2.17e+0,1.e-4,300.0,1.e-4,1.e-4,1.e-4,31.23
+-Metos3DTracerOutputDirectory                       work/
+-Metos3DTracerOutputFile                            po4.petsc,dop.petsc,oxy.petsc,phy.petsc,zoo.petsc,det.petsc,no3.petsc
+
+# bgc parameter
+-Metos3DParameterCount                              5
+-Metos3DParameterValue                              0.02,2.0,0.5,30.0,0.858
+
+# bgc boudary conditions
+-Metos3DBoundaryConditionCount                      4
+-Metos3DBoundaryConditionInputDirectory             data/TMM/2.8/Forcing/BoundaryCondition/
+-Metos3DBoundaryConditionName                       Latitude,IceCover,WindSpeed,AtmospherePressure
+# latitude
+# ice cover
+# wind speed
+# atmospheric pressure
+-Metos3DLatitudeCount                               1
+-Metos3DLatitudeFileFormat                          latitude.petsc
+-Metos3DIceCoverCount                               12
+-Metos3DIceCoverFileFormat                          fice_$02d.petsc
+-Metos3DWindSpeedCount                              12
+-Metos3DWindSpeedFileFormat                         wind_$02d.petsc
+-Metos3DAtmospherePressureCount                     12
+-Metos3DAtmospherePressureFileFormat                atmosp_$02d.petsc
+
+# bgc domain conditions
+-Metos3DDomainConditionCount                        4
+-Metos3DDomainConditionInputDirectory               data/TMM/2.8/Forcing/DomainCondition/
+-Metos3DDomainConditionName                         LayerDepth,LayerHeight,Temperature,Salinity
+# layer depth
+# layer height
+# temperature
+# salinity
+-Metos3DLayerDepthCount                             1
+-Metos3DLayerDepthFileFormat                        z.petsc
+-Metos3DLayerHeightCount                            1
+-Metos3DLayerHeightFileFormat                       dz.petsc
+-Metos3DTemperatureCount                            12
+-Metos3DTemperatureFileFormat                       Ts_$02d.petsc
+-Metos3DSalinityCount                               12
+-Metos3DSalinityFileFormat                          Ss_$02d.petsc
+
+# transport
+-Metos3DTransportType                               Matrix
+-Metos3DMatrixInputDirectory                        data/TMM/2.8/Transport/Matrix5_4/1dt/
+#-Metos3DMatrixCount                                 12
+-Metos3DMatrixCount                                 2
+-Metos3DMatrixExplicitFileFormat                    Ae_$02d.petsc
+-Metos3DMatrixImplicitFileFormat                    Ai_$02d.petsc
+
+# time stepping
+-Metos3DTimeStepStart                               0.0
+-Metos3DTimeStepCount                               2880
+#-Metos3DTimeStepCount                               1
+-Metos3DTimeStep                                    0.0003472222222222
+
+# solver
+-Metos3DSolverType                                  Spinup
+#-Metos3DSpinupCount                                 3000
+-Metos3DSpinupCount                                 1
+-Metos3DSpinupMonitor
+
+## solver (PETSc)
+#-Metos3DSolverType                                  Newton
+#-Metos3DNewton_snes_type                            ls
+#-Metos3DNewton_snes_view
+#-Metos3DNewton_snes_ksp_ew
+#-Metos3DNewton_snes_monitor
+#-Metos3DNewton_snes_linesearch_monitor
+#-Metos3DNewton_ksp_type                             gmres
+#-Metos3DNewton_ksp_monitor
+#-Metos3DNewton_ksp_view
