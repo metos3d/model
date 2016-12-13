@@ -52,22 +52,6 @@ C !LOCAL VARIABLES: ====================================================
 
       REAL*8 bgc_runoffvol(bgc_ktotal),bgc_globalrunoff
 
-c        print *, 'MOPS_BIOGEOCHEM_MODEL'
-c        print *, Nrloc
-c        print *, DeltaT
-c        print *, thetaloc
-c        print *, saltloc
-c        print *, FIceloc
-c        print *, SWRADloc
-c        print *, TAUloc
-c        print *, WINDloc
-c        print *, ATMOSPloc
-c        print *, dzloc
-c        print *, localburial
-c        print *, globalrunoff
-c        print *, localrunoffloc
-c        print *, useSeparateBiogeochemTS
-
 C     Copy physics and geometry
       bgc_kloc=Nrloc
       bgc_swr=SWRADloc
@@ -77,10 +61,6 @@ C     Copy physics and geometry
       bgc_atmosp=ATMOSPloc
       bgc_globalrunoff = globalrunoff
 
-c        bgc_dz(:) = 0.d0
-c        bgc_theta(:) = 0.d0
-c        bgc_salt(:) = 0.d0
-c        bgc_runoffvol(:) = 0.d0
       DO k=1,Nrloc
         bgc_dz(k)=dzloc(k)
         bgc_theta(k)=thetaloc(k)
@@ -96,22 +76,6 @@ C Assign the tracers in "wet" grid boxes
 	  dicgave=DICglobalavg
 C	  alkgave=ALKglobalavg
 #endif
-
-c        print *, 'MOPS_BIOGEOCHEM_MODEL, BGC_MODEL'
-c        print *, bgc_kloc
-c        print *, bgc_dz
-c        print *, bgc_runoffvol
-c        print *, bgc_globalrunoff
-c        print *, bgc_swr
-c        print *, bgc_tau
-c        print *, bgc_seaice
-c        print *, bgc_wind
-c        print *, bgc_atmosp
-c        print *, bgc_theta
-c        print *, bgc_salt
-
-c        print *, 'bgc_tracer(1:bgc_kloc, :)'
-c        print *, bgc_tracer(1:bgc_kloc, :)
 
       CALL BGC_MODEL(bgc_kloc,bgc_dz,
      &               bgc_runoffvol,bgc_globalrunoff,

@@ -25,22 +25,7 @@ subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
     integer :: n, nz, m, nbc, ndc
     real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
 
-!    ! translate metos3d names to mops names
-!    Nrloc                           = nz                ! # of layers
-!    DeltaT                          = dt*360.0*86400    ! convert fraction of year (dt) to fraction of day in seconds (DeltaT), [dt] = yr, [DeltaT] = s
-!    ! ~/.metos3d/model/model/MOPS-2.0/option/test.MOPS-2.0.option.txt
-!    ! ...
-!    ! -Metos3DDomainConditionName LayerDepth,LayerHeight,Temperature,Salinity
-!    ! ...
-!    drFloc                          = dc(:, 1)          ! layer bottom depth
-!    dzloc                           = dc(:, 2)          ! layer thickness
-!    thetaloc                        = dc(:, 3)          ! temperature
-!    saltloc                         = dc(:, 4)          ! salinity
-!    nzmax                           = 15                ! maximum # of layers
-!    nzeuph                          = 2                 ! # of euphotic layers
-!    numBiogeochemStepsPerOceanStep  = 8                 ! # of time
-!    setDefaults                     = .false.
-
+    ! mops variables
     INTEGER bgc_ktotal
     PARAMETER(bgc_ktotal=100)
     INTEGER bgc_ntracer
@@ -51,11 +36,17 @@ subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
     COMMON/BGCCONTROL/bgc_dt
 
     ! translate metos3d names to mops names, if possible
+    ! use option file ...
+    ! ~/.metos3d/model/model/MOPS-2.0/option/test.MOPS-2.0.option.txt
+    ! ... and therein look for the domain data ...
+    ! -Metos3DDomainConditionName LayerDepth,LayerHeight,Temperature,Salinity
     integer :: nzmax = 15
     integer :: nzeuph = 2
     integer :: numBiogeochemStepsPerOceanStep = 1
     logical :: setDefaults = .true.
 
+    ! zero all tracers
+    ! copy metos3d tracers to mops tracers
     bgc_tracer(:,:)       = 0.d0
     bgc_tracer(1:nz, 1:n) = y(1:nz, 1:n)
 
@@ -72,9 +63,6 @@ subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
         numBiogeochemStepsPerOceanStep, &
         setDefaults                     &
     )
-
-!    print *, 'n, nz:', n, nz
-!    print *, 'bgc_dt:', bgc_dt
 
 end subroutine
 
@@ -97,6 +85,7 @@ subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
     integer :: n, nz, m, nbc, ndc
     real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
 
+    ! mops variables
     INTEGER bgc_ktotal
     PARAMETER(bgc_ktotal=100)
     INTEGER bgc_ntracer
@@ -104,35 +93,16 @@ subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
     REAL*8 bgc_tracer
     COMMON/BGC/bgc_tracer(bgc_ktotal,bgc_ntracer)
 
-    real*8 bgc_dt
-    COMMON/BGCCONTROL/bgc_dt
-
-!    ! translate metos3d names to mops names
-!    Nrloc                           = nz                ! # of layers
-!    DeltaT                          = dt*360.0*86400    ! convert fraction of year (dt) to fraction of day in seconds (DeltaT)
-!    ! ~/.metos3d/model/model/MOPS-2.0/option/test.MOPS-2.0.option.txt
-!    ! ...
-!    ! -Metos3DDomainConditionName LayerDepth,LayerHeight,Temperature,Salinity
-!    ! ...
-!    drFloc                          = dc(:, 1)          ! layer bottom depth
-!    dzloc                           = dc(:, 2)          ! layer thickness
-!    thetaloc                        = dc(:, 3)          ! temperature
-!    saltloc                         = dc(:, 4)          ! salinity
-!    nzmax                           = 15                ! maximum # of layers
-!    nzeuph                          = 2                 ! # of euphotic layers
-!    numBiogeochemStepsPerOceanStep  = 8                 ! # of time
-!    setDefaults                     = .false.
-
     ! original insolation routine,
     ! computes all profiles at once,
     ! is embedded in C code,
     ! here, we compute only one profile and use the fortran call
 
     ! translate metos3d names to mops names, if possible, otherwise define them
+    ! use option file ...
     ! ~/.metos3d/model/model/MOPS-2.0/option/test.MOPS-2.0.option.txt
-    ! ...
+    ! ... and therein look for the boundary data ...
     ! -Metos3DBoundaryConditionName Latitude,IceCover,WindSpeed,AtmospherePressure
-    ! ...
     real*8 :: SWRADloc
     real*8 :: TAUloc
     real*8 :: localburial = 0.d0
@@ -145,49 +115,31 @@ subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
         TAUloc              &   ! &localtau[0]);
     )
 
-!    print *, SWRADloc, TAUloc
-!
-
-!    print *, 'bgc_dt:', bgc_dt
-
-!    print *, 'in:'
-!    print *, 'bgc_tracer(1:nz,1:n)'
-!    print *, bgc_tracer(1:nz,1:n)
-!!    call exit(1)
-
+    ! copy metos3d tracers to mops tracers
     bgc_tracer(1:nz, 1:n) = y(1:nz, 1:n)
 
     ! original model routine
     call MOPS_BIOGEOCHEM_MODEL( &
         nz,                 &   ! Nrloc,          &
         dt*360.0*86400,     &   ! DeltaT,         &
-
         dc(:, 3),           &   ! thetaloc,       &
         dc(:, 4),           &   ! saltloc,        &
-
         bc(2),              &   ! FIceloc,        &
-
         SWRADloc,           &
         TAUloc,             &
-
         bc(3),              &   ! WINDloc,        &
         bc(4),              &   ! ATMOSPloc,      &
-
         dc(:, 2),           &   ! dzloc,          &
-
         localburial,        &
         globalrunoff,       &
         dc(:, 2),           &   ! localrunoffloc, &
-
         .true.              &   ! useSeparateBiogeochemTS &, not used
     )
 
+    ! copy mops tracers back to metos3d tracers
+    ! subtract input from mops result,
+    ! since we only want the source minus sink term
     q(1:nz, 1:n) = bgc_tracer(1:nz, 1:n) - y(1:nz, 1:n)
-
-!    print *, 'out:'
-!    print *, 'bgc_tracer(1:nz,1:n)'
-!    print *, bgc_tracer(1:nz,1:n)
-!    call exit(1)
 
 end subroutine
 

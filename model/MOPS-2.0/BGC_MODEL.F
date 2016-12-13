@@ -126,22 +126,6 @@ c      real*8 alkchem(bgc_ktotal)
       real*8 toalk(bgc_ktotal)
 #endif
 
-c        print *, 'bgc_tracer(1:bgc_kloc, :)'
-c        print *, bgc_tracer(1:bgc_kloc, :)
-
-c        print *, 'BGC_MODEL'
-c        print *, bgc_kloc
-c        print *, bgc_dz
-c        print *, bgc_runoffvol
-c        print *, bgc_globalrunoff
-c        print *, bgc_swr
-c        print *, bgc_tau
-c        print *, bgc_seaice
-c        print *, bgc_wind
-c        print *, bgc_atmosp
-c        print *, bgc_theta
-c        print *, bgc_salt
-
 ! Reset the diagnostic fluxes per ocean time step.
 
       bgc_keuphloc = INT(MIN(bgc_kloc,bgc_keuph))
@@ -188,12 +172,6 @@ C INTERNAL TIME LOOP FOR BGC
       
 ! Reset fluxes.
 
-c        print *, 'time step:', it
-
-c        print *, '1.'
-c        print *, 'bgc_tracer(1:bgc_kloc, :)'
-c        print *, bgc_tracer(1:bgc_kloc, :)
-
       DO K=1,bgc_kloc
 
         topo4(k)=0.0d0
@@ -222,14 +200,6 @@ c        print *, bgc_tracer(1:bgc_kloc, :)
 
       CALL O2_SURFFORCING(vgas660,bgc_atmosp,bgc_theta(1),bgc_salt(1),
      &     surf_oxy,o2gasex)
-
-c        print *, 'vgas660 :', vgas660
-c        print *, 'surf_oxy:', surf_oxy
-c        print *, 'o2gasex :', o2gasex
-
-c        print *, '2.'
-c        print *, 'bgc_tracer(1:bgc_kloc, :)'
-c        print *, bgc_tracer(1:bgc_kloc, :)
 
 #ifdef CARBON
 
@@ -402,10 +372,6 @@ c        print *, bgc_tracer(1:bgc_kloc, :)
 
         ENDDO !loop over euphotic zone
 
-c        print *, '3.'
-c        print *, 'bgc_tracer(1:bgc_kloc, :)'
-c        print *, bgc_tracer(1:bgc_kloc, :)
-
 ! Explicit sinking of detritus in seperate loop.
         flux_u = 0.0d0
 
@@ -438,16 +404,11 @@ c        print *, bgc_tracer(1:bgc_kloc, :)
           f3_out(k)  = f3_out(k)+flux(k)*bgc_dt
         enddo
 
-
 ! PROCESSES AFFECTING THE ENTIRE WATER COLUMN
 ! PROCESSES AFFECTING THE ENTIRE WATER COLUMN
 ! PROCESSES AFFECTING THE ENTIRE WATER COLUMN
 ! PROCESSES AFFECTING THE ENTIRE WATER COLUMN
 ! PROCESSES AFFECTING THE ENTIRE WATER COLUMN
-
-c        print *, '4.'
-c        print *, 'bgc_tracer(1:bgc_kloc, :)'
-c        print *, bgc_tracer(1:bgc_kloc, :)
 
       DO K=1,bgc_kloc
 
@@ -618,9 +579,6 @@ c restrict anaerobic processes to regions with low oxygen concentration
         m3_out(k) = bgc_tracer(k,idin)
 
       ENDDO
-
-c        print *, 'bgc_tracer(1:bgc_kloc, :)'
-c        print *, bgc_tracer(1:bgc_kloc, :)
 
       RETURN
 
