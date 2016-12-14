@@ -25,7 +25,7 @@ C !OUPUT PARAMETERS: ===================================================
        real*8 sfac(N),stau(N)
 
 C !LOCAL VARIABLES: ====================================================
-       real*8  solar, albedo
+       real*8  solar, albedo, par
        real*8  dayfrac, yday, delta
        real*8  lat, sun1, dayhrs
        real*8  cosz, frac, fluxi, fracmin

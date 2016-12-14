@@ -372,7 +372,8 @@ C INTERNAL TIME LOOP FOR BGC
 
         ENDDO !loop over euphotic zone
 
-! Explicit sinking of detritus in seperate loop.
+
+! Explicit sinking of detritus in seperate loop. 
         flux_u = 0.0d0
 
         do k=1,bgc_kloc-1 !loop over all layers
@@ -403,6 +404,7 @@ C INTERNAL TIME LOOP FOR BGC
         do k=2,bgc_kloc
           f3_out(k)  = f3_out(k)+flux(k)*bgc_dt
         enddo
+
 
 ! PROCESSES AFFECTING THE ENTIRE WATER COLUMN
 ! PROCESSES AFFECTING THE ENTIRE WATER COLUMN

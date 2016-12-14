@@ -43,9 +43,11 @@
 -Metos3DTracerOutputDirectory                       work/
 -Metos3DTracerOutputFile                            po4.petsc,dop.petsc,oxy.petsc,phy.petsc,zoo.petsc,det.petsc,no3.petsc
 
+# !!! these are still dummy parameters
 # bgc parameter
--Metos3DParameterCount                              5
--Metos3DParameterValue                              0.02,2.0,0.5,30.0,0.858
+-Metos3DParameterCount                              1
+-Metos3DParameterValue                              0.0
+# !!! these are still dummy parameters
 
 # bgc boudary conditions
 -Metos3DBoundaryConditionCount                      4
@@ -91,8 +93,8 @@
 
 # time stepping
 -Metos3DTimeStepStart                               0.0
--Metos3DTimeStepCount                               2880
-#-Metos3DTimeStepCount                               1
+#-Metos3DTimeStepCount                               2880
+-Metos3DTimeStepCount                               1
 -Metos3DTimeStep                                    0.0003472222222222
 
 # solver

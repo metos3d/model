@@ -51,7 +51,7 @@ C !LOCAL VARIABLES: ====================================================
       REAL*8 bgc_theta(bgc_ktotal),bgc_salt(bgc_ktotal)
 
       REAL*8 bgc_runoffvol(bgc_ktotal),bgc_globalrunoff
-
+      
 C     Copy physics and geometry
       bgc_kloc=Nrloc
       bgc_swr=SWRADloc
