@@ -23,6 +23,7 @@
 %
 %	packages
 %
+\usepackage{listings}
 \usepackage{natbib}
 \usepackage{amsmath}
 \usepackage[pdfborder={0 0 0},colorlinks,urlcolor=blue]{hyperref}
@@ -65,22 +66,25 @@ Excellence Cluster The Future Ocean, Christian-Albrechts-Platz 4, 24118 Kiel, Ge
 %
 \section{Model interface}
 
-Metos3D can be coupled to every (biogeochemical) model that conforms to the following interface:
+Metos3D \citep[][]{PiwSla16} can be coupled to every (biogeochemical) model that
+conforms to the following interface:
 
 \begin{verbatim}
-subroutine metos3dbgc(n, ny, m, nb, nd, dt, q, t, y, u, b, d)
-    integer :: n           ! tracer count
-    integer :: ny          ! layer count
-    integer :: m           ! parameter count
+subroutine metos3dbgc(ny, nx, nu, nb, nd, q, t, dt, x, dx, y, u, b, d)
+    integer :: ny          ! tracer count
+    integer :: nx          ! layer count
+    integer :: nu          ! parameter count
     integer :: nb          ! boundary condition count
     integer :: nd          ! domain condition count
-    real*8  :: dt          ! ocean time step
-    real*8  :: q(nz, n)    ! bgc model output
+    real*8  :: q(nx, ny)   ! bgc model output
     real*8  :: t           ! point in time
-    real*8  :: y(nz, n)    ! bgc model input
-    real*8  :: u(m)        ! parameters
+    real*8  :: dt          ! ocean time step
+    real*8  :: x(nx)       ! point in space
+    real*8  :: dx(nx)      ! ocean step widths
+    real*8  :: y(nx, ny)   ! bgc model input
+    real*8  :: u(nu)       ! parameters
     real*8  :: b(nb)       ! boundary conditions
-    real*8  :: d(nz, nd)   ! domain conditions
+    real*8  :: d(nx, nd)   ! domain conditions
 end subroutine
 \end{verbatim}
 
@@ -90,140 +94,180 @@ The interface decouples biogeochemical models and driver routines
 It gives you the possibility to provide a free number of tracers,
 parameters, boundary and domain conditions. It suits well an
 optimization as well as an Automatic Differentiation (AD) context.
-%
+
+The interface changed slightly since it was introduced for the first time.
+You can find the old version in the appendix. A more detailed description
+of the available models can be found at \citep[][]{PiwSla16}.
 
 
+%%
+%%	BGC Models
+%%
+%\section{BGC Models}
 %
-%	BGC Models
+%Generally,
+%for every model implementation that
+%is coupled to the transport driver via the interface
+%a new executable must be compiled.
+%%
+%Metos3D provides an automatic compile scheme
+%along with a convention for the model directory structure.
+%%
+%Within the \texttt{model} directory of the \texttt{model} repository
+%a folder with the model name must be created.
+%%
+%Regarding the two models presented here,
+%the directory is named \texttt{I-Cs} respectively
+%\texttt{MITgcm-PO4-DOP}.
+%%
+%Within such a model directory a source file named
+%\texttt{model.F} is stored.
+%%
+%Overall,
+%whereas here the file suffix implies a pre-processed Fortran fixed format,
+%every programming language that is supported by the PETSc library
+%will be accepted.
 %
-\section{BGC Models}
-
-Generally,
-for every model implementation that
-is coupled to the transport driver via the interface
-a new executable must be compiled.
 %
-Metos3D provides an automatic compile scheme
-along with a convention for the model directory structure.
 %
-Within the \texttt{model} directory of the \texttt{model} repository
-a folder with the model name must be created.
+%Finally,
+%to compile all sources invoke
+%%
+%\begin{verbatim}
+%$> metos3d simpack MITgcm-PO4-DOP
+%\end{verbatim}
+%%
+%to create an executable named
+%%
+%\begin{verbatim}
+%metos3d-simpack-MITgcm-PO4-DOP.exe
+%\end{verbatim}
+%%
+%respectively
+%%
+%\begin{verbatim}
+%$> metos3d simpack I-Cs
+%\end{verbatim}
+%%
+%to create
+%%
+%\begin{verbatim}
+%metos3d-simpack-I-Cs.exe
+%\end{verbatim}
 %
-Regarding the two models presented here,
-the directory is named \texttt{I-Cs} respectively
-\texttt{MITgcm-PO4-DOP}.
 %
-Within such a model directory a source file named
-\texttt{model.F} is stored.
 %
-Overall,
-whereas here the file suffix implies a pre-processed Fortran fixed format,
-every programming language that is supported by the PETSc library
-will be accepted.
-
-
-
-Finally,
-to compile all sources invoke
+%Specific settings are provided via option files.
+%%
+%Exemplary,
+%each of the two presented model archives contain an \texttt{option} directory.
+%%
+%You can find a test option file therein.
+%%
+%Use it as a starting point for your own work.
+%%
+%To start a test run just type:
+%%
+%\small
+%\begin{verbatim}
+%$> ./metos3d-simpack-I-Cs.exe model/I-Cs/option/test.I-Cs.option.txt
+%\end{verbatim}
+%%
+%respectively
+%%
+%\begin{verbatim}
+%$> ./metos3d-simpack-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/test.MITgcm-PO4-DOP.option.txt
+%\end{verbatim}
+%\normalsize
 %
-\begin{verbatim}
-$> metos3d simpack MITgcm-PO4-DOP
-\end{verbatim}
 %
-to create an executable named
+%%
+%%	I-Cs
+%%
+%\subsection{\texttt{I-Cs}}
 %
-\begin{verbatim}
-metos3d-simpack-MITgcm-PO4-DOP.exe
-\end{verbatim}
+%The Iodine (I) and Caesium (Cs) model was implemented to the predict
+%the Caesium distribution after the Fukushima accident.
 %
-respectively
+%%
+%%	Equations
+%%
+%\subsubsection{Equations}
 %
-\begin{verbatim}
-$> metos3d simpack I-Cs
-\end{verbatim}
+%The model equations describe the radioactive decay of the $I^{131}$ and $Cs^{137}$
+%isotops named $y_1$ and $y_2$, respectively. The decay depends on the
+%half-life. The tracers do not react with each other. The equations read:
+%\begin{align*}
+%q_1(y_1, y_2)	& = \log(0.5) \, 360.0 / 8.02070 \, y_1 \\
+%q_2(y_1, y_2)	& = \log(0.5) \, 1.0 / 30.17 \, y_2
+%\end{align*}
 %
-to create
+%%
+%%	MITgcm-PO4-DOP
+%%
+%\subsection{\texttt{MITgcm-PO4-DOP}}
 %
-\begin{verbatim}
-metos3d-simpack-I-Cs.exe
-\end{verbatim}
-
-
-
-Specific settings are provided via option files.
-%
-Exemplary,
-each of the two presented model archives contain an \texttt{option} directory.
-%
-You can find a test option file therein.
-%
-Use it as a starting point for your own work.
-%
-To start a test run just type:
-%
-\small
-\begin{verbatim}
-$> ./metos3d-simpack-I-Cs.exe model/I-Cs/option/test.I-Cs.option.txt
-\end{verbatim}
-%
-respectively
-%
-\begin{verbatim}
-$> ./metos3d-simpack-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/test.MITgcm-PO4-DOP.option.txt
-\end{verbatim}
-\normalsize
-
-
-%
-%	I-Cs
-%
-\subsection{\texttt{I-Cs}}
-
-The Iodine (I) and Caesium (Cs) model was implemented to the predict
-the Caesium distribution after the Fukushima accident.
-
-%
-%	Equations
-%
-\subsubsection{Equations}
-
-The model equations describe the radioactive decay of the $I^{131}$ and $Cs^{137}$
-isotops named $y_1$ and $y_2$, respectively. The decay depends on the
-half-life. The tracers do not react with each other. The equations read:
-\begin{align*}
-q_1(y_1, y_2)	& = \log(0.5) \, 360.0 / 8.02070 \, y_1 \\
-q_2(y_1, y_2)	& = \log(0.5) \, 1.0 / 30.17 \, y_2
-\end{align*}
-
-%
-%	MITgcm-PO4-DOP
-%
-\subsection{\texttt{MITgcm-PO4-DOP}}
-
-The \texttt{MITgcm-PO4-DOP} model is an \emph{original} implementation of
-a biogeochemical model that is used for the 
-MIT General Circulation Model \citep[cf.][MITgcm]{MAHPH97}
-biogeochemistry tutorial and described in detail in
-\citep[][]{DuSoScSt05}.
-%
-The model comprises five biogeochemical variables,
-namely
-dissolved inorganic carbon (DIC),
-alkalinity (ALK),
-phosphate (PO4),
-dissolved organic phosphorous (DOP) and
-oxygen (O2).
-%
-In fact, here,
-for verification just PO4 and DOP are used.
+%The \texttt{MITgcm-PO4-DOP} model is an \emph{original} implementation of
+%a biogeochemical model that is used for the 
+%MIT General Circulation Model \citep[cf.][MITgcm]{MAHPH97}
+%biogeochemistry tutorial and described in detail in
+%\citep[][]{DuSoScSt05}.
+%%
+%The model comprises five biogeochemical variables,
+%namely
+%dissolved inorganic carbon (DIC),
+%alkalinity (ALK),
+%phosphate (PO4),
+%dissolved organic phosphorous (DOP) and
+%oxygen (O2).
+%%
+%In fact, here,
+%for verification just PO4 and DOP are used.
 
 %
 %
 %	References	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \bibliographystyle{plain}
-\bibliography{/Users/jpicau/Documents/ARBEIT/CODE/Literature/literature}
-%\input{metos3d-model.bbl.tex}
+\bibliography{/Users/jpicau/Documents/work/svn/Literature/literature}
+%\input{metos3d-model.bbl}
+
+\appendix
+
+\section{Depricated BGC API}
+
+Listing~\ref{list:interface} shows the BGC API as it was introduced
+for the first time in \citep[][]{PiwSla16}. This form is now \textbf{deprecated}.
+
+
+%list:interface
+\lstset{language=[95]Fortran}
+\begin{lstlisting}[float=*,
+caption={Fortran 95 implementation of the coupling interface for biogeochemical models.},
+label=list:interface,basicstyle=\ttfamily]
+subroutine metos3dbgc(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d)
+    integer :: ny, nx, nu, nb, nd
+    real*8  :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd)
+end subroutine
+\end{lstlisting}
+
+%\begin{verbatim}
+%subroutine metos3dbgc(n, ny, m, nb, nd, dt, q, t, y, u, b, d)
+%    integer :: n           ! tracer count
+%    integer :: ny          ! layer count
+%    integer :: m           ! parameter count
+%    integer :: nb          ! boundary condition count
+%    integer :: nd          ! domain condition count
+%    real*8  :: dt          ! ocean time step
+%    real*8  :: q(nz, n)    ! bgc model output
+%    real*8  :: t           ! point in time
+%    real*8  :: y(nz, n)    ! bgc model input
+%    real*8  :: u(m)        ! parameters
+%    real*8  :: b(nb)       ! boundary conditions
+%    real*8  :: d(nz, nd)   ! domain conditions
+%end subroutine
+%\end{verbatim}
+
 
 \end{document}
 
