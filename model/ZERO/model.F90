@@ -19,31 +19,30 @@
 !
 !   metos3dbgcinit
 !
-subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     implicit none
     ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+    integer :: ny, nx, nu, nb, nd, ndiag
+    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
 end subroutine
 
 !
 !   metos3dbgcfinal
 !
-subroutine metos3dbgcfinal(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+subroutine metos3dbgcfinal(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     implicit none
     ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+    integer :: ny, nx, nu, nb, nd, ndiag
+    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
 end subroutine
 
 !
 !   metos3dbgc
 !
-subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+subroutine metos3dbgc(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     implicit none
     ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
-
+    integer :: ny, nx, nu, nb, nd, ndiag
+    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
 end subroutine
 
