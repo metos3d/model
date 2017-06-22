@@ -1,23 +1,9 @@
 \begin{thebibliography}{1}
 
-\bibitem{DuSoScSt05}
-Stephanie Dutkiewicz, Andrei~P. Sokolov, Jeffery Scott, and Peter~H. Stone.
-\newblock {A} three-dimensional ocean-seaice-carbon cycle model and its
-  coupling to a two-dimensional atmospheric model: {U}ses in climate change
-  studies.
-\newblock Technical Report 122, MIT Joint Program on the Science and Policy of
-  Global Change, Cambridge, 2005.
-
-\bibitem{MAHPH97}
-J.~Marshall, A.~Adcroft, C.~Hill, L.~Perelman, and C.~Heisey.
-\newblock A finite-volume, incompressible navier stokes model for studies of
-  the ocean on parallel computers.
-\newblock {\em Journal of Geophysical Research}, 102:5753--5766, 1997.
-
 \bibitem{PiwSla16}
 J.~Piwonski and T.~Slawig.
-\newblock Metos3d:~the marine ecosystem toolkit for optimization and simulation
-  in 3-d -- part 1: Simulation package v0.3.2.
-\newblock {\em Geoscientific Model Development}, 9(10):3729--3750, 2016.
+\newblock Metos3{D}: the {M}arine {E}cosystem {T}oolkit for {O}ptimization and
+  {S}imulation in 3-{D} -- {P}art 1: {S}imulation {P}ackage v0.3.2.
+\newblock {\em Geoscientific Model Development}, 9:3729--3750, 2016.
 
 \end{thebibliography}
