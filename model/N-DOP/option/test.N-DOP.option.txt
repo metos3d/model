@@ -22,18 +22,22 @@
 # geometry
 -Metos3DGeometryType                                Profile
 -Metos3DProfileInputDirectory                       data/TMM/2.8/Geometry/
-# new in v0.3+
 -Metos3DProfileMaskFile                             landSeaMask.petsc
 -Metos3DProfileVolumeFile                           volumes.petsc
-# v0.2, will be deprecated in the future
--Metos3DProfileIndexStartFile                       gStartIndices.bin
--Metos3DProfileIndexEndFile                         gEndIndices.bin
 
 # bgc tracer
 -Metos3DTracerCount                                 2
+-Metos3DTracerName                                  N,DOP
 -Metos3DTracerInitValue                             2.17e+0,1.e-4
 -Metos3DTracerOutputDirectory                       work/
 -Metos3DTracerOutputFile                            N.petsc,DOP.petsc
+# weight with volumes and sum up
+-Metos3DTracerMonitor
+
+# diagnostic variables
+-Metos3DDiagnosticCount                             0
+# weight with volumes and sum up
+#-Metos3DDiagnosticMonitor
 
 # bgc parameter
 -Metos3DParameterCount                              7

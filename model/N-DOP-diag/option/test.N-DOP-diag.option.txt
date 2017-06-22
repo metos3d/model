@@ -26,22 +26,29 @@
 -Metos3DProfileVolumeFile                           volumes.petsc
 
 # bgc tracer
--Metos3DTracerCount                                 1
--Metos3DTracerName                                  N
--Metos3DTracerInitValue                             2.17e+0
+-Metos3DTracerCount                                 2
+-Metos3DTracerName                                  N,DOP
+-Metos3DTracerInitValue                             2.5e+0,1.e-4
 -Metos3DTracerOutputDirectory                       work/
--Metos3DTracerOutputFile                            N.petsc
+-Metos3DTracerOutputFile                            N.petsc,DOP.petsc
 # weight with volumes and sum up
 -Metos3DTracerMonitor
 
-# diagnostic variables
--Metos3DDiagnosticCount                             0
+# diagnostic variables ...
+# ... are not advected
+-Metos3DDiagnosticCount                             2
+# gome: global organic matter export
+# gpp : global primary production
+-Metos3DDiagnosticName                              gome,gpp
+-Metos3DDiagnosticInitValue                         0.0,0.0
+-Metos3DDiagnosticOutputDirectory                   work/
+-Metos3DDiagnosticOutputFile                        gome.petsc,gpp.petsc
 # weight with volumes and sum up
-#-Metos3DDiagnosticMonitor
+-Metos3DDiagnosticMonitor
 
 # bgc parameter
--Metos3DParameterCount                              5
--Metos3DParameterValue                              0.02,2.0,0.5,30.0,0.858
+-Metos3DParameterCount                              7
+-Metos3DParameterValue                              0.02,20.0,0.5,30.0,0.67,0.5,0.858
 
 # bgc boudary conditions
 -Metos3DBoundaryConditionCount                      2
