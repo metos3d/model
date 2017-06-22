@@ -16,6 +16,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+v0.4.0
+- implemented new BGC API into every model, includes diagnostic variables now
+- added diag versions of NPZD-DOP model hierarchy
+- added AGE model
+- added ZERO model, template
+
 v0.3.3
 - updated README and CHANGELOG
 
