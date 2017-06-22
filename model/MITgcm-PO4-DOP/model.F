@@ -28,13 +28,13 @@
       !
       !   metos3dbgcinit
       !
-      subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt,
-     &  q, t, y, u, b, d, ndiag, diag)
+      subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt,
+     &  q, t, y, u, bc, dc)
         implicit none
         ! input variables
-        integer :: ny, nx, nu, nb, nd, ndiag
-        real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu)
-        real(8) :: b(nb), d(nx, nd), diag(nx, ndiag)
+        integer :: n, nz, m, nbc, ndc
+        real*8  :: dt, q(nz, n), t, y(nz, n), u(m)
+        real*8  :: bc(nbc), dc(nz, ndc)
 
 #include "SIZE.h"
 #include "GRID.h"
@@ -52,12 +52,15 @@
         ! make sure depths are: d(:,1)
         !          heights are: d(:,2)
         rF(1)           = 0.d0                       ! bgcinit
-        rF(2:nz+1)      = - d(1:nx,1)
-        drF(1:nz)       = d(1:nx,2)
-        recip_drF(1:nz) = 1.d0/drF(1:nx)             ! bgcinit
+        rF(2:nz+1)      = - dc(1:nz,1)
+        drF(1:nz)       = dc(1:nz,2)
+        recip_drF(1:nz) = 1.d0/drF(1:nz)             ! bgcinit
 
       end
 
+      !
+      !   metos3dbgcinit
+      !
       subroutine metos3dbgc(n, nz, m, nbc, ndc, dt,
      &  q, t, y, u, bc, dc)
         implicit none
@@ -151,7 +154,10 @@
 
       end
 
-        subroutine metos3dbgcfinal(n, nz, m, nbc, ndc, dt,
+      !
+      !   metos3dbgcfinal
+      !
+      subroutine metos3dbgcfinal(n, nz, m, nbc, ndc, dt,
      &  q, t, y, u, bc, dc)
             implicit none
             ! input variables
