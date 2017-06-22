@@ -22,15 +22,16 @@
 #include "BGC_MODEL.F"
 #include "mops_biogeochem_model.F"
 
-!
-!   metos3dbgcinit
-!
-      subroutine metos3dbgcinit(
-     &    n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+      !
+      !   metos3dbgcinit
+      !
+      subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt,
+     &  q, t, y, u, b, d, ndiag, diag)
         implicit none
         ! input variables
-        integer :: n, nz, m, nbc, ndc
-        real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+        integer :: ny, nx, nu, nb, nd, ndiag
+        real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu)
+        real(8) :: b(nb), d(nx, nd), diag(nx, ndiag)
 
         ! mops variables
         INTEGER bgc_ktotal
@@ -55,16 +56,16 @@
         ! zero all tracers
         ! copy metos3d tracers to mops tracers
         bgc_tracer(:,:)       = 0.d0
-        bgc_tracer(1:nz, 1:n) = y(1:nz, 1:n)
+        bgc_tracer(1:nx, 1:ny) = y(1:nx, 1:ny)
 
         ! call original init routine
         call MOPS_BIOGEOCHEM_INI(
-     &       nz,                                ! Nrloc,      &
+     &       nx,                                ! Nrloc,      &
      &       dt*360.0*86400,                    ! DeltaT,     &
-     &       dc(:, 3),                          ! thetaloc,   &
-     &       dc(:, 4),                          ! saltloc,    &
-     &       dc(:, 2),                          ! dzloc,      &
-     &       dc(:, 1),                          ! drFloc,     &
+     &       d(:, 3),                           ! thetaloc,   &
+     &       d(:, 4),                           ! saltloc,    &
+     &       d(:, 2),                           ! dzloc,      &
+     &       d(:, 1),                           ! drFloc,     &
      &       nzmax,
      &       nzeuph,
      &       numBiogeochemStepsPerOceanStep,

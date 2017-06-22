@@ -16,8 +16,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !
-!   model.F
-!
 !   Model for PO4, DOP from MITgcm
 !
 
@@ -25,16 +23,18 @@
 #include "phos_flux.F"
 #include "bio_export.F"
 #include "dic_biotic_forcing.F"
-
 #include "DIC_OPTIONS.h"
 
-      subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt,
-     &  q, t, y, u, bc, dc)
+      !
+      !   metos3dbgcinit
+      !
+      subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt,
+     &  q, t, y, u, b, d, ndiag, diag)
         implicit none
         ! input variables
-        integer :: n, nz, m, nbc, ndc
-        real*8  :: dt, q(nz, n), t, y(nz, n), u(m)
-        real*8  :: bc(nbc), dc(nz, ndc)
+        integer :: ny, nx, nu, nb, nd, ndiag
+        real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu)
+        real(8) :: b(nb), d(nx, nd), diag(nx, ndiag)
 
 #include "SIZE.h"
 #include "GRID.h"
@@ -49,12 +49,12 @@
         parfrac         = 0.4 _d 0                   ! bgcinit
         PTRACERS_dTLev  = dt*360.d0                  ! bgcinit
         ! depths and heights
-        ! make sure depths are: dc(:,1)
-        !          heights are: dc(:,2)
+        ! make sure depths are: d(:,1)
+        !          heights are: d(:,2)
         rF(1)           = 0.d0                       ! bgcinit
-        rF(2:nz+1)      = - dc(1:nz,1)
-        drF(1:nz)       = dc(1:nz,2)
-        recip_drF(1:nz) = 1.d0/drF(1:nz)             ! bgcinit
+        rF(2:nz+1)      = - d(1:nx,1)
+        drF(1:nz)       = d(1:nx,2)
+        recip_drF(1:nz) = 1.d0/drF(1:nx)             ! bgcinit
 
       end
 
