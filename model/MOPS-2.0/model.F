@@ -73,26 +73,28 @@
      &   )
       end subroutine
 
-!
-!   metos3dbgcfinal
-!
-      subroutine metos3dbgcfinal(
-     &    n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+      !
+      !   metos3dbgcfinal
+      !
+      subroutine metos3dbgcfinal(ny, nx, nu, nb, nd, dt,
+     &  q, t, y, u, b, d, ndiag, diag)
         implicit none
         ! input variables
-        integer :: n, nz, m, nbc, ndc
-        real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+        integer :: ny, nx, nu, nb, nd, ndiag
+        real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu)
+        real(8) :: b(nb), d(nx, nd), diag(nx, ndiag)
       end subroutine
 
-!
-!   metos3dbgc
-!
-      subroutine metos3dbgc(
-     &    n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+      !
+      !   metos3dbgc
+      !
+      subroutine metos3dbgc(ny, nx, nu, nb, nd, dt,
+     &  q, t, y, u, b, d, ndiag, diag)
         implicit none
         ! input variables
-        integer :: n, nz, m, nbc, ndc
-        real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+        integer :: ny, nx, nu, nb, nd, ndiag
+        real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu)
+        real(8) :: b(nb), d(nx, nd), diag(nx, ndiag)
 
         ! mops variables
         INTEGER bgc_ktotal
@@ -117,38 +119,36 @@
         real*8 :: localburial = 0.d0
         real*8 :: globalrunoff = 0.0d0
         call insolation(
-     &       1,                     ! &lNumProfiles,
-     &       dt*360.0*86400,        ! &myTime,
-     &       bc(1),                 ! &locallatitude[0],
-     &       SWRADloc,              ! &localswrad[0],
-     &       TAUloc                 ! &localtau[0]);
-     &   )
+     &       1,                     ! lNumProfiles,
+     &       dt*360.0*86400,        ! myTime,
+     &       b(1),                  ! locallatitude[0],
+     &       SWRADloc,              ! localswrad[0],
+     &       TAUloc)                ! localtau[0]);
 
         ! copy metos3d tracers to mops tracers
-        bgc_tracer(1:nz, 1:n) = y(1:nz, 1:n)
+        bgc_tracer(1:nx, 1:ny) = y(1:nx, 1:ny)
 
         ! original model routine
         call MOPS_BIOGEOCHEM_MODEL(
-     &       nz,                    ! Nrloc,          &
-     &       dt*360.0*86400,        ! DeltaT,         &
-     &       dc(:, 3),              ! thetaloc,       &
-     &       dc(:, 4),              ! saltloc,        &
-     &       bc(2),                 ! FIceloc,        &
+     &       nx,                    ! Nrloc,
+     &       dt*360.0*86400.0,      ! DeltaT,
+     &       d(:, 3),               ! thetaloc,
+     &       d(:, 4),               ! saltloc,
+     &       b(2),                  ! FIceloc,
      &       SWRADloc,
      &       TAUloc,
-     &       bc(3),                 ! WINDloc,        &
-     &       bc(4),                 ! ATMOSPloc,      &
-     &       dc(:, 2),              ! dzloc,          &
+     &       b(3),                  ! WINDloc,        &
+     &       b(4),                  ! ATMOSPloc,      &
+     &       d(:, 2),               ! dzloc,          &
      &       localburial,
      &       globalrunoff,
-     &       dc(:, 2),              ! localrunoffloc, &
-     &       .true.                 ! useSeparateBiogeochemTS &, not used
-     &   )
+     &       d(:, 2),               ! localrunoffloc, &
+     &       .true.)                ! useSeparateBiogeochemTS &, not used
 
         ! copy mops tracers back to metos3d tracers
         ! subtract input from mops result,
         ! since we only want the source minus sink term
-        q(1:nz, 1:n) = bgc_tracer(1:nz, 1:n) - y(1:nz, 1:n)
+        q(1:nx, 1:ny) = bgc_tracer(1:nx, 1:ny) - y(1:nx, 1:ny)
 
       end subroutine
 

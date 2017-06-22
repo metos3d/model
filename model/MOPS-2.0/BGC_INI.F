@@ -23,10 +23,10 @@ C INITIALIZE CALCULATE THE P CORE (BIOGEOCHEMISTRY)
 
 C PREPROCESSOR OPTIONS:
 
-C CALLED BY:	mops_biogeochem_ini
+C CALLED BY: mops_biogeochem_ini
 
 C CALLS:	
-		
+
 C INPUT/ARGUMENT LIST:	
 C bgc_zu()	depth of upper boundary of vertical layers
 C setDefaults	switch for parameter reinitialization
@@ -101,15 +101,15 @@ C BGC PARAMETERS FOR SURFACE OCEAN BIOLOGY
 ! Note that the second order approx. is basically similar to their
 ! function 2 for T-dependent nitrogen fixation multiplied by 4 
 ! (2 [N atoms per mole] * 12 [light hrs per day]/6 [C-atoms per N-atoms])
-	    tf2 = -0.0042d0
-	    tf1 = 0.2253d0
-	    tf0 = -2.7819d0
-	    tff = 0.2395d0  
-	    nfix = 2.0d-3 ![mmol N/m3/d]; if PO4>0 and DIN = 0 and T=26.82 this corresponds 
-	                  !to an integral over 100 m of ~ 200 umol N/m2/d, a 
-		              !rather high value acc. to Mahaffey et al., 2005
-		              !alternatively, 2 umol/m3/d = 0.08 nmol/L/hr,
-		              !a rather high value acc. to Mulholland (2007)
+        tf2 = -0.0042d0
+        tf1 = 0.2253d0
+        tf0 = -2.7819d0
+        tff = 0.2395d0  
+        nfix = 2.0d-3 ![mmol N/m3/d]; if PO4>0 and DIN = 0 and T=26.82 this corresponds 
+                      !to an integral over 100 m of ~ 200 umol N/m2/d, a 
+                      !rather high value acc. to Mahaffey et al., 2005
+                      !alternatively, 2 umol/m3/d = 0.08 nmol/L/hr,
+                      !a rather high value acc. to Mulholland (2007)
 
 ! Phytoplankton parameters
         TempB = 15.65d0 !ref. temperature for T-dependent growth
