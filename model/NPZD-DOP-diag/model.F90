@@ -19,34 +19,39 @@
 !
 !   metos3dbgcinit
 !
-subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     implicit none
     ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+    integer :: ny, nx, nu, nb, nd, ndiag
+    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
+
+    ! diagnostics
+    ! init variables to zero at the beginning
+    diag(1:nx, 1:ndiag) = 0.0d0
+
 end subroutine
 
 !
 !   metos3dbgcfinal
 !
-subroutine metos3dbgcfinal(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+subroutine metos3dbgcfinal(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     implicit none
     ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+    integer :: ny, nx, nu, nb, nd, ndiag
+    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
 end subroutine
 
 !
 !   metos3dbgc
 !
-subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+subroutine metos3dbgc(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     implicit none
     ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+    integer :: ny, nx, nu, nb, nd, ndiag
+    real*8  :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
 
     ! NPZD-DOP model
-    call NPZDDOPmodel(n, nz, m, dt, q, t, y(1,1), y(1,2), y(1,3), y(1,4), y(1,5), u, bc(1), bc(2), dc(1,1), dc(1,2))
+    call NPZDDOPmodel(ny, nx, nu, dt, q, t, y(1,1), y(1,2), y(1,3), y(1,4), y(1,5), u, b(1), b(2), d(1,1), d(1,2), ndiag, diag)
 
 end subroutine
 
@@ -55,11 +60,17 @@ end subroutine
 !
 !   NPZD-DOP model
 !
-subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmaice, z, dz)
+subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmaice, z, dz, ndiag, diag)
     implicit none
     ! input variables
     integer :: n, nz, m
     real*8  :: dt, q(nz, n), t, yN(nz), yP(nz), yZ(nz), yD(nz), yDOP(nz), u(m), phi, sigmaice, z(nz), dz(nz)
+
+    ! diagnostics
+    integer  :: ndiag
+    integer, parameter :: igome = 1
+    integer, parameter :: igpp  = 2
+    real(8) :: diag(nz, ndiag)
 
     ! constants
     integer, parameter :: jeuphotic = 2                         ! number of euphotic layers
@@ -127,6 +138,9 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
         fP = muP * yPj * yNj / (KN + yNj) * IPj / (KI + IPj)
         fZ = muZ * yZj * yPj*yPj / (KP*KP + yPj*yPj)
 
+        ! diagnostics
+        diag(j, igpp) = diag(j, igpp) + fP * dt * 360.d0
+
         ! uptake
         q(j, 1) = q(j, 1) - fP                                                 + lambdaZ * yZj
         q(j, 2) = q(j, 2) + fP - fZ                            - lambdaP * yPj
@@ -145,6 +159,12 @@ subroutine NPZDDOPmodel(n, nz, m, dt, q, t, yN, yP, yZ, yD, yDOP, u, phi, sigmai
         ! D concentration
         wj  = aD * (z(j) - 0.5d0 * dz(j)) + bD
         yDj = max(yD(j), 0.d0)
+
+        ! diagnostics
+        if (j == jeuphotic) then
+            diag(j, igome) = diag(j, igome) + wj*yDj/dz(j) * dt * 360.d0
+        endif
+
         ! flux difference
         q(j, 4) = q(j, 4) + (wjm1*yDjm1 - wj*yDj)/dz(j)
         ! shift
