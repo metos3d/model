@@ -17,26 +17,6 @@
 !
 
 !
-!   metos3dbgcinit
-!
-subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
-    implicit none
-    ! input variables
-    integer :: ny, nx, nu, nb, nd, ndiag
-    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
-end subroutine
-
-!
-!   metos3dbgcfinal
-!
-subroutine metos3dbgcfinal(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
-    implicit none
-    ! input variables
-    integer :: ny, nx, nu, nb, nd, ndiag
-    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
-end subroutine
-
-!
 !   metos3dbgc
 !
 subroutine metos3dbgc(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
@@ -68,4 +48,5 @@ subroutine metos3dbgc(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     q(1,1) = - y(1,1)
 
 end subroutine
+
 

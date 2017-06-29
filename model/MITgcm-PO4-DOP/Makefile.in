@@ -1,0 +1,10 @@
+# c ompiler flags
+CFLAGS = -DBGCINIT=metos3dbgcinit_ -DBGC=metos3dbgc_
+
+# BGC object files
+BGCMODELOBJ = \
+	insol.o \
+	phos_flux.o \
+	bio_export.o \
+	dic_biotic_forcing.o \
+	model.o

@@ -17,9 +17,9 @@
 !
 
 !
-!   metos3dbgcinit
+!   metos3dbgcbegin
 !
-subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
+subroutine metos3dbgcbegin(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     implicit none
     ! input variables
     integer :: ny, nx, nu, nb, nd, ndiag
@@ -29,16 +29,6 @@ subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     ! init variables to zero at the beginning
     diag(1:nx, 1:ndiag) = 0.0d0
 
-end subroutine
-
-!
-!   metos3dbgcfinal
-!
-subroutine metos3dbgcfinal(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
-    implicit none
-    ! input variables
-    integer :: ny, nx, nu, nb, nd, ndiag
-    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
 end subroutine
 
 !
@@ -54,8 +44,6 @@ subroutine metos3dbgc(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
     call Nmodel(ny, nx, nu, dt, q, t, y(1,1), u, b(1), b(2), d(1,1), d(1,2), ndiag, diag)
 
 end subroutine
-
-#include "insolation.F90"
 
 !
 !   N model

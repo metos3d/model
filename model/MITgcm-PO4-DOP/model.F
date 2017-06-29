@@ -19,22 +19,18 @@
 !   Model for PO4, DOP from MITgcm
 !
 
-#include "insol.F"
-#include "phos_flux.F"
-#include "bio_export.F"
-#include "dic_biotic_forcing.F"
 #include "DIC_OPTIONS.h"
 
       !
       !   metos3dbgcinit
       !
       subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt,
-     &  q, t, y, u, bc, dc)
+     &  q, t, y, u, bc, dc, ndiag, diag)
         implicit none
         ! input variables
-        integer :: n, nz, m, nbc, ndc
+        integer :: n, nz, m, nbc, ndc, ndiag
         real*8  :: dt, q(nz, n), t, y(nz, n), u(m)
-        real*8  :: bc(nbc), dc(nz, ndc)
+        real*8  :: bc(nbc), dc(nz, ndc), diag(nz, ndiag)
 
 #include "SIZE.h"
 #include "GRID.h"
@@ -62,12 +58,12 @@
       !   metos3dbgcinit
       !
       subroutine metos3dbgc(n, nz, m, nbc, ndc, dt,
-     &  q, t, y, u, bc, dc)
+     &  q, t, y, u, bc, dc, ndiag, diag)
         implicit none
         ! input variables
-        integer :: n, nz, m, nbc, ndc
+        integer :: n, nz, m, nbc, ndc, ndiag
         real*8  :: dt, q(nz, n), t, y(nz, n), u(m)
-        real*8  :: bc(nbc), dc(nz, ndc)
+        real*8  :: bc(nbc), dc(nz, ndc), diag(nz, ndiag)
 
 #include "SIZE.h"
 #include "GRID.h"
@@ -154,18 +150,9 @@
 
       end
 
-      !
-      !   metos3dbgcfinal
-      !
-      subroutine metos3dbgcfinal(n, nz, m, nbc, ndc, dt,
-     &  q, t, y, u, bc, dc)
-            implicit none
-            ! input variables
-            integer :: n, nz, m, nbc, ndc
-            real*8  :: dt, q(nz, n), t, y(nz, n), u(m)
-            real*8  :: bc(nbc), dc(nz, ndc)
-        end
-
+!
+!   void routines, called in the original code 
+!
         SUBROUTINE ALK_SURFFORCING( PTR_ALK , GALK,
      I           bi,bj,imin,imax,jmin,jmax,
      I           myIter,myTime,myThid)

@@ -1,0 +1,7 @@
+# c ompiler flags
+CFLAGS = -DBGC=metos3dbgc_
+
+# BGC object files
+BGCMODELOBJ = \
+	insolation.o \
+	model.o

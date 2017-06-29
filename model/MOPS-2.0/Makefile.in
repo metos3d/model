@@ -1,0 +1,11 @@
+# c ompiler flags
+CFLAGS = -DBGCINIT=metos3dbgcinit_ -DBGC=metos3dbgc_
+
+# BGC object files
+BGCMODELOBJ = \
+	BGC_INI.o \
+	BGC_MODEL.o \
+	insolation.o \
+	mops_biogeochem_ini.o \
+	mops_biogeochem_model.o \
+	model.o

@@ -16,28 +16,6 @@
 ! You should have received a copy of the GNU General Public License
 ! along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !
-!   Model for Iodine and Caesium.
-!
-
-!
-!   metos3dbgcinit
-!
-subroutine metos3dbgcinit(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
-    implicit none
-    ! input variables
-    integer :: ny, nx, nu, nb, nd, ndiag
-    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
-end subroutine
-
-!
-!   metos3dbgcfinal
-!
-subroutine metos3dbgcfinal(ny, nx, nu, nb, nd, dt, q, t, y, u, b, d, ndiag, diag)
-    implicit none
-    ! input variables
-    integer :: ny, nx, nu, nb, nd, ndiag
-    real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu), b(nb), d(nx, nd), diag(nx, ndiag)
-end subroutine
 
 !
 !   metos3dbgcfinal
@@ -92,3 +70,5 @@ subroutine ICsmodel(t, dt, ntracer, nlayer, nbc, bc, ndc, dc, y, ybgc, nparam, u
     end if
 
 end subroutine
+
+

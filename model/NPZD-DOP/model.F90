@@ -17,40 +17,18 @@
 !
 
 !
-!   metos3dbgcinit
-!
-subroutine metos3dbgcinit(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
-    implicit none
-    ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
-end subroutine
-
-!
-!   metos3dbgcfinal
-!
-subroutine metos3dbgcfinal(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
-    implicit none
-    ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
-end subroutine
-
-!
 !   metos3dbgc
 !
-subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc)
+subroutine metos3dbgc(n, nz, m, nbc, ndc, dt, q, t, y, u, bc, dc, ndiag, diag)
     implicit none
     ! input variables
-    integer :: n, nz, m, nbc, ndc
-    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc)
+    integer :: n, nz, m, nbc, ndc, ndiag
+    real*8  :: dt, q(nz, n), t, y(nz, n), u(m), bc(nbc), dc(nz, ndc), diag(nz, ndiag)
 
     ! NPZD-DOP model
     call NPZDDOPmodel(n, nz, m, dt, q, t, y(1,1), y(1,2), y(1,3), y(1,4), y(1,5), u, bc(1), bc(2), dc(1,1), dc(1,2))
 
 end subroutine
-
-#include "insolation.F90"
 
 !
 !   NPZD-DOP model

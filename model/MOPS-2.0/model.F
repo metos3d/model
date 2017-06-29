@@ -16,12 +16,6 @@
 ! along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !
 
-#include "insolation.F"
-#include "BGC_INI.F"
-#include "mops_biogeochem_ini.F"
-#include "BGC_MODEL.F"
-#include "mops_biogeochem_model.F"
-
       !
       !   metos3dbgcinit
       !
@@ -71,18 +65,6 @@
      &       numBiogeochemStepsPerOceanStep,
      &       setDefaults
      &   )
-      end subroutine
-
-      !
-      !   metos3dbgcfinal
-      !
-      subroutine metos3dbgcfinal(ny, nx, nu, nb, nd, dt,
-     &  q, t, y, u, b, d, ndiag, diag)
-        implicit none
-        ! input variables
-        integer :: ny, nx, nu, nb, nd, ndiag
-        real(8) :: dt, q(nx, ny), t, y(nx, ny), u(nu)
-        real(8) :: b(nb), d(nx, nd), diag(nx, ndiag)
       end subroutine
 
       !

@@ -1,0 +1,6 @@
+# c ompiler flags
+CFLAGS = -DBGCINIT=metos3dbgcinit_ -DBGCBEGIN=metos3dbgcbegin_ -DBGC=metos3dbgc_  -DBGCEND=metos3dbgcend_ -DBGCFINAL=metos3dbgcfinal_
+
+# BGC object files
+BGCMODELOBJ = \
+	model.o
