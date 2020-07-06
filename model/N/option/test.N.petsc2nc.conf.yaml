@@ -1,0 +1,3 @@
+Name, Scale, Unit, Description:
+    # prognostic variables
+    - N,        1.,         mmol P m-3,     N
